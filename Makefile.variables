@@ -1,0 +1,9 @@
+ABSCURDIR	:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+
+# executables
+CC			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-gcc
+LD			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-gcc
+
+# there was an -fpic flag, but it was removed
+CFLAGS		:= -ffreestanding -flto -fno-stack-protector -fshort-wchar -MMD -MP -mno-red-zone -std=c11 -Wall -Wextra
+LDFLAGS		:= -static -Bsymbolic -nostdlib
