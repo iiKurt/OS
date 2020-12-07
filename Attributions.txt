@@ -1,0 +1,8 @@
+UEFI headers (efi.h and statuses.h):
+	ExoVerse (https://github.com/ExoVerse)
+
+Refined (shortened) ELF format (efi.h):
+	rv8.io (https://github.com/rv8-io/rv8/blob/master/src/elf/elf.h)
+
+Bootloader ELF loading:
+	Poncho (https://github.com/Absurdponcho/PonchoOS/blob/main/gnu-efi/bootloader/main.c)
