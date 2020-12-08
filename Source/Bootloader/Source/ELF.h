@@ -1,5 +1,7 @@
 // https://github.com/rv8-io/rv8/blob/master/src/elf/elf.h
 
+#pragma once
+
 #define	ELFMAG		"\177ELF"
 #define	SELFMAG		4
 
