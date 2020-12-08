@@ -1,5 +1,6 @@
 Makefiles:
 	a todo target showing all todos in source files
+	an image target that creates a loadable disk image from the HDD folder
 
 Bootloader:
 	Seperate stuff into distinct files
