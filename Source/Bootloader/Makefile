@@ -38,12 +38,12 @@ DEPENDENCIES	:= $(patsubst %.o,%.d,$(OBJECTS))
 # link the object files into the EFI file under Build/Binary/bootx64.efi, if objects are newer than the EFI file
 $(BOOTLOADER): $(OBJECTS)
 # using $(OBJECTS) to link all objects instead of $<, which only does first object file
-	$(LD) $(LDFLAGS) -entry:efi_main $(OBJECTS) -out:$@
+	@$(LD) $(LDFLAGS) -entry:efi_main $(OBJECTS) -out:$@
 
 # rules for module files
 $(BUILDDIR)/%.o: $(SOURCEDIR)/%.c
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 # include the dependencies if they exist
 # pro tip: this command's gotta be at the bottom or otherwise bad things happen...
@@ -51,4 +51,4 @@ $(BUILDDIR)/%.o: $(SOURCEDIR)/%.c
 -include $(DEPENDENCIES)
 
 clean:
-	rm -rf $(BUILDDIR)
+	-@rm -rf $(BUILDDIR)
