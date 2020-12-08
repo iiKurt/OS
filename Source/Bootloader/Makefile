@@ -7,11 +7,11 @@
 include ../../Makefile.variables
 # ^ not even sure if I should be including this with the amount of customisations I'm making...
 
-CC			:= /usr/local/opt/llvm/bin/clang
-LD			:= /usr/local/opt/llvm/bin/lld-link
-TARGET		:= x86_64-pc-win32-coff
+CC				:= /usr/local/opt/llvm/bin/clang
+LD				:= /usr/local/opt/llvm/bin/lld-link
+TARGET			:= x86_64-pc-win32-coff
 
-CFLAGS			+= -ISource -target $(TARGET) 
+CFLAGS			+= -target $(TARGET) 
 # yes, the := is intentional
 LDFLAGS			:= -subsystem:efi_application -dll
 TARGET			:= x86_64-pc-win32-coff
@@ -23,10 +23,11 @@ SOURCEDIR		:= Source
 # output binary path
 BOOTLOADER		:= $(BUILDDIR)/bootx64.efi
 
+# _could_ automatically populate this but eh
 OBJECTS			:= \
-	efi/efi.o \
-	bootloader.o \
-	services/LoadFile.o
+	EFI/EFI.o \
+	Bootloader.o \
+	Services/LoadFile.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))

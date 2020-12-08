@@ -7,14 +7,14 @@ BUILDDIR		:= Build
 SOURCEDIR		:= Source
 
 # Extend the makefile.variables
-CFLAGS			+= -I$(SOURCEDIR)
-LDFLAGS			+= -T kernel.ld
+#CFLAGS			+=
+LDFLAGS			+= -T Kernel.ld
 
 # output binary path
-KERNEL			:= $(BUILDDIR)/kernel.elf
+KERNEL			:= $(BUILDDIR)/Kernel.elf
 
 OBJECTS			:= \
-	kernel.o
+	Kernel.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))

@@ -1,14 +1,6 @@
 Makefiles:
 	a todo target showing all todos in source files
-	include directories in CFLAGS (-I)
-	"you shouldn't be invoking ld directly in the first place, but rather linking with your cross-compiler"
-	make Bootloader makefile independent of makefile.variables
-
-General:
-	Title Case for filenames
-	>>>>> Use "" instead of <> where possible <<<<<
-		Then remove -Isource or -I$(SOURCEDIR) from indivdual makefiles
-		Then have -ISource/Shared in makefile.variables
 
 Bootloader:
 	Seperate stuff into distinct files
+	make Bootloader makefile independent of makefile.variables
