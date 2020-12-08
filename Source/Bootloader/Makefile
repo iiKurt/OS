@@ -9,12 +9,10 @@ include ../../Makefile.variables
 
 CC				:= /usr/local/opt/llvm/bin/clang
 LD				:= /usr/local/opt/llvm/bin/lld-link
-TARGET			:= x86_64-pc-win32-coff
 
-CFLAGS			+= -target $(TARGET) 
+CFLAGS			+= -target x86_64-pc-win32-coff
 # yes, the := is intentional
 LDFLAGS			:= -subsystem:efi_application -dll
-TARGET			:= x86_64-pc-win32-coff
 
 # object file generation path
 BUILDDIR		:= Build
@@ -27,7 +25,8 @@ BOOTLOADER		:= $(BUILDDIR)/bootx64.efi
 OBJECTS			:= \
 	EFI/EFI.o \
 	Bootloader.o \
-	Services/LoadFile.o
+	Services/LoadFile.o \
+	Services/LoadKernel.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
