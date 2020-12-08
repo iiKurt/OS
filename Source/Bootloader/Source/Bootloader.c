@@ -15,8 +15,6 @@
 #include "Services/LoadKernel.h"
 #include "Services/GOP.h"
 
-typedef unsigned long long size_t;
-
 void pause(EFI_SYSTEM_TABLE* SystemTable) {
 	EFI_INPUT_KEY key;
 	while(SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &key) == EFI_NOT_READY); // freeze the system until keypress

@@ -1,8 +1,9 @@
 Makefiles:
 	a todo target showing all todos in source files
+	Master makefile: don't copy files if other makefiles return "up to date"
 
 Bootloader:
-	Seperate stuff into distinct files
+	Possibily make the EFI SystemTable a global variable?
 	make Bootloader makefile independent of makefile.variables. This involves:
 		Copying relevant CFLAGS from https://wiki.osdev.org/User:No92/UEFI_Bare_Bones to the makefile
 		Deleting all the CFLAGS in makefile.variables and replacing it with poncho's
