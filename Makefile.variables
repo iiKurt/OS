@@ -1,9 +1,11 @@
-ABSCURDIR	:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+ABSCURDIR	:= $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+SHARED		:= $(ABSCURDIR)/Source/Shared
 
 # executables
 CC			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-gcc
 LD			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-gcc
 
 # there was an -fpic flag, but it was removed
-CFLAGS		:= -ffreestanding -flto -fno-stack-protector -fshort-wchar -MMD -MP -mno-red-zone -std=c11 -Wall -Wextra -I$(ABSCURDIR)/Source/Shared
-LDFLAGS		:= -static -Bsymbolic -nostdlib
+CFLAGS		:= -ffreestanding -fshort-wchar -mno-red-zone -flto -MMD -MP -std=c11 -Wall -Wextra -I$(SHARED)
+# max-page-size: https://stackoverflow.com/a/64808242/5638389, reduces ELF size
+LDFLAGS		:= -static -Bsymbolic -nostdlib -Wl,-z,max-page-size=4096

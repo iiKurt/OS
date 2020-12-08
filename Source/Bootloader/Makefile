@@ -7,14 +7,14 @@
 include ../../Makefile.variables
 # ^ not even sure if I should be including this with the amount of customisations I'm making...
 
+# yes, the :='s are intentional
 CC				:= /usr/local/opt/llvm/bin/clang
 LD				:= /usr/local/opt/llvm/bin/lld-link
 TARGET			:= x86_64-pc-win32-coff
 
-CFLAGS			+= -target $(TARGET) 
-# yes, the := is intentional
+# there was an -fpic option that was removed
+CFLAGS			:= -ffreestanding -flto -fno-stack-protector -fshort-wchar -I$(SHARED) -MMD -MP -mno-red-zone -std=c11 -target x86_64-pc-win32-coff -Wall -Wextra -target $(TARGET)
 LDFLAGS			:= -subsystem:efi_application -dll
-TARGET			:= x86_64-pc-win32-coff
 
 # object file generation path
 BUILDDIR		:= Build
