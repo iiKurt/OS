@@ -10,10 +10,9 @@ include ../../Makefile.variables
 # yes, the :='s are intentional
 CC				:= /usr/local/opt/llvm/bin/clang
 LD				:= /usr/local/opt/llvm/bin/lld-link
-TARGET			:= x86_64-pc-win32-coff
 
 # there was an -fpic option that was removed
-CFLAGS			:= -ffreestanding -flto -fno-stack-protector -fshort-wchar -I$(SHARED) -MMD -MP -mno-red-zone -std=c11 -target x86_64-pc-win32-coff -Wall -Wextra -target $(TARGET)
+CFLAGS			:= -ffreestanding -flto -fno-stack-protector -fshort-wchar -I$(SHARED) -MMD -MP -mno-red-zone -std=c11 -target x86_64-pc-win32-coff -Wall -Wextra -target x86_64-pc-win32-coff
 LDFLAGS			:= -subsystem:efi_application -dll
 
 # object file generation path
@@ -27,7 +26,9 @@ BOOTLOADER		:= $(BUILDDIR)/bootx64.efi
 OBJECTS			:= \
 	EFI/EFI.o \
 	Bootloader.o \
-	Services/LoadFile.o
+	Services/LoadFile.o \
+	Services/LoadKernel.o \
+	Services/GOP.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
@@ -38,12 +39,12 @@ DEPENDENCIES	:= $(patsubst %.o,%.d,$(OBJECTS))
 # link the object files into the EFI file under Build/Binary/bootx64.efi, if objects are newer than the EFI file
 $(BOOTLOADER): $(OBJECTS)
 # using $(OBJECTS) to link all objects instead of $<, which only does first object file
-	$(LD) $(LDFLAGS) -entry:efi_main $(OBJECTS) -out:$@
+	@$(LD) $(LDFLAGS) -entry:efi_main $(OBJECTS) -out:$@
 
 # rules for module files
 $(BUILDDIR)/%.o: $(SOURCEDIR)/%.c
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 # include the dependencies if they exist
 # pro tip: this command's gotta be at the bottom or otherwise bad things happen...
@@ -51,4 +52,4 @@ $(BUILDDIR)/%.o: $(SOURCEDIR)/%.c
 -include $(DEPENDENCIES)
 
 clean:
-	rm -rf $(BUILDDIR)
+	-@rm -rf $(BUILDDIR)
