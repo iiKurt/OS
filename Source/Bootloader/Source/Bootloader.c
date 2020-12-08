@@ -13,54 +13,13 @@
 
 #include "Services/LoadFile.h"
 #include "Services/LoadKernel.h"
+#include "Services/GOP.h"
 
 typedef unsigned long long size_t;
-
-typedef struct {
-	void* BaseAddress;
-	size_t BufferSize;
-	unsigned int Width;
-	unsigned int Height;
-	unsigned int PixelsPerScanLine;
-} Framebuffer;
-
-#define PSF1_MAGIC0 0x36
-#define PSF1_MAGIC1 0x04
-
-typedef struct {
-	unsigned char magic[2];
-	unsigned char mode;
-	unsigned char charsize;
-} PSF1_HEADER;
-
-typedef struct {
-	PSF1_HEADER* psf1_Header;
-	void* glyphBuffer;
-} PSF1_FONT;
 
 void pause(EFI_SYSTEM_TABLE* SystemTable) {
 	EFI_INPUT_KEY key;
 	while(SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &key) == EFI_NOT_READY); // freeze the system until keypress
-}
-
-Framebuffer framebuffer;
-Framebuffer* InitializeGOP(EFI_SYSTEM_TABLE* SystemTable) {
-	EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-	EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
-	EFI_STATUS status;
-
-	status = SystemTable->BootServices->LocateProtocol(&gopGuid, NULL, (void**)&gop);
-	if(status == EFI_ERROR) {
-		return NULL;
-	}
-
-	framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
-	framebuffer.BufferSize = gop->Mode->FrameBufferSize;
-	framebuffer.Width = gop->Mode->Info->HorizontalResolution;
-	framebuffer.Height = gop->Mode->Info->VerticalResolution;
-	framebuffer.PixelsPerScanLine = gop->Mode->Info->PixelsPerScanLine;
-
-	return &framebuffer;
 }
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
@@ -81,8 +40,17 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 
 	// Read kernel image into header
 	Elf64_Ehdr header;
-	ReadKernel(SystemTable, Kernel, &header);
-	SystemTable->ConOut->OutputString(SystemTable->ConOut, L"test!\n\r");
+	{
+		UINTN FileInfoSize;
+		EFI_FILE_INFO* FileInfo;
+
+		Kernel->GetInfo(Kernel, &EFI_FILE_INFO_GUID, &FileInfoSize, NULL);
+		SystemTable->BootServices->AllocatePool(EfiLoaderData, FileInfoSize, (void**)&FileInfo);
+		Kernel->GetInfo(Kernel, &EFI_FILE_INFO_GUID, &FileInfoSize, (void**)&FileInfo);
+
+		UINTN size = sizeof(header);
+		Kernel->Read(Kernel, &size, &header);
+	}
 
 	// Check if kernel image format is valid
 	if (KernelValid(&header))
@@ -97,7 +65,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 	}
 
 	// Read the kernel into memory
-	if (LoadKernel(SystemTable, Kernel, &header)) {
+	if (ReadKernel(SystemTable, Kernel, &header)) {
 		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel loaded\n\r");
 	}
 	else {
@@ -106,11 +74,11 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 		return EFI_LOAD_ERROR;
 	}
 	
-
+	// Do the GOP
 	Framebuffer* fb = InitializeGOP(SystemTable);
 
 	if (fb == NULL) {
-		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Unable to locate GOP\n\r");
+		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"GOP not found\n\r");
 		pause(SystemTable);
 		return EFI_ERROR;
 	}

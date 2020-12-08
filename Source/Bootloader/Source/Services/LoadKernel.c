@@ -1,21 +1,5 @@
 #include "LoadKernel.h"
 
-#include <stddef.h>
-
-void ReadKernel(EFI_SYSTEM_TABLE* SystemTable, EFI_FILE_PROTOCOL* Kernel, Elf64_Ehdr* header) {
-	UINTN FileInfoSize;
-	EFI_FILE_INFO* FileInfo;
-
-	Kernel->GetInfo(Kernel, &EFI_FILE_INFO_GUID, &FileInfoSize, NULL);
-	SystemTable->BootServices->AllocatePool(EfiLoaderData, FileInfoSize, (void**)&FileInfo);
-	//Kernel->GetInfo(Kernel, &EFI_FILE_INFO_GUID, &FileInfoSize, (void**)&FileInfo); // << BAD
-
-	UINTN size = sizeof(*header);
-	Kernel->Read(Kernel, &size, header);
-	
-	SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Function done\n\r");
-}
-
 int memcmp(const void* aptr, const void* bptr, size_t n){
 	const unsigned char* a = aptr, *b = bptr;
 	for (size_t i = 0; i < n; i++){
@@ -34,7 +18,7 @@ int KernelValid(Elf64_Ehdr* header) {
 			header->e_version != EV_CURRENT;
 }
 
-int LoadKernel(EFI_SYSTEM_TABLE* SystemTable, EFI_FILE_PROTOCOL* Kernel, Elf64_Ehdr* header) {
+int ReadKernel(EFI_SYSTEM_TABLE* SystemTable, EFI_FILE_PROTOCOL* Kernel, Elf64_Ehdr* header) {
 	Elf64_Phdr* phdrs;
 	{
 		Kernel->SetPosition(Kernel, header->e_phoff);

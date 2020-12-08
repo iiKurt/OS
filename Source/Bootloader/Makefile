@@ -26,7 +26,8 @@ OBJECTS			:= \
 	EFI/EFI.o \
 	Bootloader.o \
 	Services/LoadFile.o \
-	Services/LoadKernel.o
+	Services/LoadKernel.o \
+	Services/GOP.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
