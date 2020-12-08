@@ -7,11 +7,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include <efi/efi.h>
-#include <efi/statuses.h>
-#include <elf.h>
+#include "EFI/EFI.h"
+#include "EFI/Statuses.h"
+#include "ELF.h"
 
-#include "services/LoadFile.h"
+#include "Services/LoadFile.h"
 
 typedef unsigned long long size_t;
 typedef uint64_t UINTN;
@@ -80,7 +80,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 	SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Loading kernel...\n\r");
 
 	// Acquire kernel image
-	EFI_FILE_PROTOCOL* Kernel = LoadFile(NULL, L"kernel.elf", ImageHandle, SystemTable);
+	EFI_FILE_PROTOCOL* Kernel = LoadFile(NULL, L"Kernel.elf", ImageHandle, SystemTable);
 	if (Kernel == NULL){
 		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel not acquired\n\r");
 
