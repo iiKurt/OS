@@ -1,5 +1,5 @@
 ABSCURDIR	:= $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
-SHARED		:= $(ABSCURDIR)/Source/Shared
+SHARED		:= $(ABSCURDIR)/Source/Shared/Source
 
 # executables
 CC			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-gcc

@@ -5,6 +5,7 @@ include ./Makefile.variables
 SOURCEDIR	:= ./Source
 BUILDDIR	:= ./Build
 TOOLSDIR	:= ./Tools
+BUNDLEDDIR	:= ./Bundled
 
 # pro tip: don't indent comments or have comments inline with a command
 
@@ -24,10 +25,11 @@ execute: hdd $(OVMF)
 
 # construct the drive used by the emulator
 .PHONY: hdd
-hdd: bootloader kernel
+hdd: shared bootloader kernel
 	@mkdir -p $(HDD)/efi/boot
 	@cp $(SOURCEDIR)/Bootloader/Build/bootx64.efi $(HDD)/efi/boot/bootx64.efi
 	@cp $(SOURCEDIR)/Kernel/Build/Kernel.elf $(HDD)/Kernel.elf
+	@cp $(BUNDLEDDIR)/zap-light16.psf $(HDD)/zap-light16.psf
 
 # downloads OVMF
 $(OVMF):
@@ -46,6 +48,10 @@ clean:
 ####################
 # Build components #
 ####################
+
+.PHONY: shared
+shared:
+	@$(MAKE) -C $(SOURCEDIR)/Shared
 
 # make the bootloader
 .PHONY: bootloader

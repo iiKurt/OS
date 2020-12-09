@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <PSF.h>
 
 #include "EFI/EFI.h"
 #include "EFI/Statuses.h"
@@ -14,6 +15,7 @@
 #include "Services/LoadFile.h"
 #include "Services/LoadKernel.h"
 #include "Services/GOP.h"
+#include "Services/LoadFont.h"
 
 void pause(EFI_SYSTEM_TABLE* SystemTable) {
 	EFI_INPUT_KEY key;
@@ -27,13 +29,13 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 	// Acquire kernel image
 	EFI_FILE_PROTOCOL* Kernel = LoadFile(NULL, L"Kernel.elf", ImageHandle, SystemTable);
 	if (Kernel == NULL){
-		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel not acquired\n\r");
+		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel not found\n\r");
 
 		pause(SystemTable);
 		return EFI_LOAD_ERROR;
 	}
 	else {
-		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel acquired\n\r");
+		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel found\n\r");
 	}
 
 	// Read kernel image into header
@@ -84,15 +86,20 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"GOP located\n\r");
 	}
 
-	unsigned int y = 50;
-	unsigned int BBP = 4; //4 bytes per pixel
+	// Do the PSF1 font
+	PSF1_FONT* font = LoadPSF1Font(NULL, L"zap-light16.psf", ImageHandle, SystemTable);
 
-	for (unsigned int x = 0; x < fb->Width / 2 * BBP; x++) {
-		*(unsigned int*)(x + (y * fb->PixelsPerScanLine * BBP) + fb->BaseAddress) = 0xff0000ff;
+	if (font == NULL) { // Font not found
+		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Font not found or is not valid\n\r");
+		pause(SystemTable);
+		return EFI_ERROR;
+	}
+	else {
+		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Font found\n\r");
 	}
 
 	// Call kernel
-	((__attribute__((sysv_abi)) void (*)())header.e_entry)();
+	((__attribute__((sysv_abi)) void (*)(Framebuffer*, PSF1_FONT*))header.e_entry)(fb, font);
 	SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Wait so does it work up until here?!\n\r");
 
 	SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
