@@ -28,7 +28,8 @@ OBJECTS			:= \
 	Bootloader.o \
 	Services/LoadFile.o \
 	Services/LoadKernel.o \
-	Services/GOP.o
+	Services/GOP.o \
+	Services/LoadFont.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
