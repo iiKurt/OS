@@ -2,6 +2,10 @@
 /Tools/
 **/Build/
 
+#####################################
+# General compilation/build ignores #
+#####################################
+
 # Prerequisites
 *.d
 

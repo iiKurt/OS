@@ -1,7 +1,9 @@
 Makefiles:
 	a todo target showing all todos in source files
 	an image target that creates a loadable disk image from the HDD folder
-	Master makefile: don't copy files if other makefiles return "up to date"
+	Master makefile - don't copy files if:
+		other makefiles return "up to date"
+		or if a bundled resource modification date is same or older than destination
 
 Bootloader:
 	Possibily make the EFI SystemTable a global variable?
