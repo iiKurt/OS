@@ -16,7 +16,8 @@ OVMF		:= $(TOOLSDIR)/OVMF.fd
 # QEMU
 HDD			:= $(BUILDDIR)/HDD
 EMU			:= qemu-system-x86_64
-EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -M accel=kvm:tcg -net none -serial stdio
+# was using -M accel=kvm:tcg
+EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -M accel=tcg -net none -serial stdio
 
 # executes the emulator
 .PHONY: execute
