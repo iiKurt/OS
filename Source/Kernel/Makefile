@@ -14,7 +14,8 @@ LDFLAGS			+= -T Kernel.ld
 KERNEL			:= $(BUILDDIR)/Kernel.elf
 
 OBJECTS			:= \
-	Kernel.o
+	Kernel.o \
+	BasicRenderer.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
