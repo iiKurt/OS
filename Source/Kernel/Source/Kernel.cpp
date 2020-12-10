@@ -1,8 +1,10 @@
+#include <BootInfo.h>
+
 #include "BasicRenderer.hpp"
 #include "String.hpp"
 
-extern "C" void _start(Framebuffer* fb, PSF1_FONT* font) {
-	BasicRenderer br = BasicRenderer(fb, font);
+extern "C" void _start(BootInfo* bootInfo) {
+	BasicRenderer br = BasicRenderer(bootInfo->fb, bootInfo->font);
 	br.CursorPosition = {0, 0};
 
 	for (int i = 0; i < 50; i++) {
