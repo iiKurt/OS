@@ -3,9 +3,13 @@ SHARED		:= $(ABSCURDIR)/Source/Shared/Source
 
 # executables
 CC			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-gcc
-LD			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-gcc
+CXX			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-g++
+# LD shouldn't be invoked... perhaps remove this...
+LD			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-ld
 
 # there was an -fpic flag, but it was removed
-CFLAGS		:= -ffreestanding -fshort-wchar -mno-red-zone -flto -MMD -MP -std=c11 -Wall -Wextra -I$(SHARED)
+# is -std=c11 
+CFLAGS		:= -ffreestanding -fshort-wchar -mno-red-zone -flto -MMD -MP -Wall -Wextra -I$(SHARED)
+CXXFLAGS	:= -ffreestanding -fshort-wchar -mno-red-zone -flto -MMD -MP -Wall -Wextra -I$(SHARED)
 # max-page-size: https://stackoverflow.com/a/64808242/5638389, reduces ELF size
 LDFLAGS		:= -static -Bsymbolic -nostdlib -Wl,-z,max-page-size=4096
