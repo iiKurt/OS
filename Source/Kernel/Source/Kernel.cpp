@@ -11,7 +11,7 @@ void putChar(Framebuffer* fb, PSF1_FONT* font, unsigned int color, char chr, uns
 	unsigned int* pixPtr = (unsigned int*)fb->BaseAddress;
 	// Multiply character we want to print by the height of the character
 	// Character we want can be found by adding offset onto the glyphBuffer starting point
-	char* fontPtr = font->glyphBuffer + (chr * font->psf1_Header->charsize); // Indexing
+	char* fontPtr = (char*)font->glyphBuffer + (chr * font->psf1_Header->charsize); // Indexing
 
 	for (unsigned long y = yOff; y < yOff + 16; y++) { // 16 bits high
 		for (unsigned long x = xOff; x < xOff + 8; x++) { // 8 bits long
@@ -28,8 +28,8 @@ void putChar(Framebuffer* fb, PSF1_FONT* font, unsigned int color, char chr, uns
 }
 
 Point CursorPosition;
-void print(Framebuffer* fb, PSF1_FONT* font, unsigned int color, char* str) {
-	char* chr = str;
+void print(Framebuffer* fb, PSF1_FONT* font, unsigned int color, const char* str) {
+	char* chr = (char*)str;
 
 	while (*chr != 0) {
 		if (CursorPosition.X + 8 > fb->Width) { // If incrementing the cursor position will result in a character being drawn off screen
@@ -43,7 +43,7 @@ void print(Framebuffer* fb, PSF1_FONT* font, unsigned int color, char* str) {
 	}
 }
 
-void _start(Framebuffer* fb, PSF1_FONT* font) {
+extern "C" void _start(Framebuffer* fb, PSF1_FONT* font) {
 	CursorPosition.X = 0;
 	CursorPosition.Y = 0;
 

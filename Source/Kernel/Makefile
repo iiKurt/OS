@@ -24,12 +24,12 @@ DEPENDENCIES	:= $(patsubst %.o,%.d,$(OBJECTS))
 
 # link the object files into the ELF file under Build/kernel.elf, if objects are newer than the ELF file
 $(KERNEL): $(OBJECTS)
-	@$(CC) $(LDFLAGS) -o $@ $(OBJECTS)
+	@$(CXX) $(LDFLAGS) -o $@ $(OBJECTS)
 
 # rules for module files
-$(BUILDDIR)/%.o: $(SOURCEDIR)/%.c
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%.cpp
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # include the dependencies if they exist
 -include $(DEPENDENCIES)
