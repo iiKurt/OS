@@ -15,7 +15,8 @@ KERNEL			:= $(BUILDDIR)/Kernel.elf
 
 OBJECTS			:= \
 	Kernel.o \
-	BasicRenderer.o
+	BasicRenderer.o \
+	String.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
