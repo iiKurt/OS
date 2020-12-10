@@ -6,7 +6,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <Framebuffer.h>
 #include <PSF.h>
+#include <BootInfo.h>
 
 #include "EFI/EFI.h"
 #include "EFI/Statuses.h"
@@ -66,10 +68,10 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 
 	// Read the kernel into memory
 	if (ReadKernel(SystemTable, Kernel, &header)) {
-		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel loaded\n\r");
+		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel read\n\r");
 	}
 	else {
-		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel not loaded\n\r");
+		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Kernel not read\n\r");
 		pause(SystemTable);
 		return EFI_LOAD_ERROR;
 	}
@@ -98,11 +100,30 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 		SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Font found\n\r");
 	}
 
-	// Call kernel
-	((__attribute__((sysv_abi)) void (*)(Framebuffer*, PSF1_FONT*))header.e_entry)(fb, font);
-	SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Wait so does it work up until here?!\n\r");
+	// Memory
+	EFI_MEMORY_DESCRIPTOR* Map = NULL;
+	UINTN MapSize, MapKey;
+	UINTN DescriptorSize;
+	uint32_t DescriptorVersion;
+	{
+		SystemTable->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+		SystemTable->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
+		SystemTable->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+	}
 
-	SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+	BootInfo bootInfo;
+	bootInfo.fb = fb;
+	bootInfo.font = font;
+	bootInfo.mMap = Map;
+	bootInfo.mMapDescriptorSize = DescriptorSize;
+	
+	// System will crash after this point if we use any EFI services
+	SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
+
+	// Call kernel
+	((__attribute__((sysv_abi)) void (*)(BootInfo*))header.e_entry)(&bootInfo);
+
 	// we _shouldn't_ ever reach this point
+	SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
 	return EFI_SUCCESS; // Exit the UEFI application (may crash the system after the kernel is loaded)
 }
