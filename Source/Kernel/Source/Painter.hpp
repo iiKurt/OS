@@ -15,4 +15,5 @@ public:
 
 	void PrintCharacter(char chr, unsigned int xOff, unsigned int yOff, unsigned int primaryColor, unsigned int secondaryColor);
 	void PrintString(const char* str, unsigned int x, unsigned int y);
+	void DrawFilledRectangle(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color);
 };

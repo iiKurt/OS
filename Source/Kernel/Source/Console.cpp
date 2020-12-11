@@ -27,3 +27,7 @@ void Console::PrintLine(const char* str) {
 	cursorPosition.X = 0;
 	cursorPosition.Y += 16;
 }
+
+void Console::Clear() {
+	painter->DrawFilledRectangle(0, 0, painter->FB->Width, painter->FB->Height, BackgroundColor);
+}
