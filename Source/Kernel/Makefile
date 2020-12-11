@@ -17,7 +17,8 @@ OBJECTS			:= \
 	Kernel.o \
 	Painter.o \
 	Console.o \
-	String.o
+	String.o \
+	EFIMemory.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
