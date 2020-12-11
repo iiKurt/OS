@@ -1,3 +1,6 @@
+Generic:
+	Formatting style/naming convention of function names and class memeber variables
+
 Makefiles:
 	a todo target showing all todos in source files
 	an image target that creates a loadable disk image from the HDD folder

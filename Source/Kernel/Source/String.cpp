@@ -96,7 +96,7 @@ const char* to_string(double value, uint8_t decimalPlaces) {
 	return stringOutput;
 }
 
-const char* generic_to_hstring(uint8_t* valPtr, uint8_t size) {
+const char* generic_to_hex_string(uint8_t* valPtr, uint8_t size) {
 
 	size -= 1;
 	uint8_t* ptr;
@@ -118,18 +118,18 @@ const char* generic_to_hstring(uint8_t* valPtr, uint8_t size) {
 	return stringOutput;
 }
 
-const char* to_hstring(uint64_t value) {
-	return generic_to_hstring((uint8_t*)&value, 16); // Will only show last 16 characters
+const char* to_hex_string(uint64_t value) {
+	return generic_to_hex_string((uint8_t*)&value, 16); // Will only show last 16 characters
 }
 
-const char* to_hstring(uint32_t value) {
-	return generic_to_hstring((uint8_t*)&value, 8);
+const char* to_hex_string(uint32_t value) {
+	return generic_to_hex_string((uint8_t*)&value, 8);
 }
 
-const char* to_hstring(uint16_t value) {
-	return generic_to_hstring((uint8_t*)&value, 4);
+const char* to_hex_string(uint16_t value) {
+	return generic_to_hex_string((uint8_t*)&value, 4);
 }
 
-const char* to_hstring(uint8_t value) {
-	return generic_to_hstring((uint8_t*)&value, 2);
+const char* to_hex_string(uint8_t value) {
+	return generic_to_hex_string((uint8_t*)&value, 2);
 }
