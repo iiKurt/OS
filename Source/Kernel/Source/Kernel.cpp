@@ -8,6 +8,7 @@ extern "C" void _start(BootInfo* bootInfo) {
 	Painter p = Painter(bootInfo->fb, bootInfo->font);
 	Console c = Console(&p);
 
+	c.Clear();
 	// Print some information about the system
 	c.ForegroundColor = 0xFF00FF00;
 	c.PrintLine("[System Info]");

@@ -48,3 +48,11 @@ void Painter::PrintString(const char* str, unsigned int x, unsigned int y) {
 		chr++;
 	}
 }
+
+void Painter::DrawFilledRectangle(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color) {
+	for (unsigned int i = 0; i < w; i++) {
+		for (unsigned int j = 0; j < h; j++) {
+			*(unsigned int*)((unsigned int*)FB->BaseAddress + (x + i) + ((y + j) * FB->PixelsPerScanLine)) = color;
+		}
+	}
+}

@@ -18,4 +18,5 @@ public:
 
 	void Print(const char* str);
 	void PrintLine(const char* str);
+	void Clear();
 };
