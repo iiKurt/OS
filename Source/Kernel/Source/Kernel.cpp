@@ -1,33 +1,27 @@
 #include <BootInfo.h>
 
-#include "BasicRenderer.hpp"
+#include "Painter.hpp"
+#include "Console.hpp"
 #include "String.hpp"
 
 extern "C" void _start(BootInfo* bootInfo) {
-	BasicRenderer br = BasicRenderer(bootInfo->fb, bootInfo->font);
-	br.CursorPosition = {0, 0};
+	Painter p = Painter(bootInfo->fb, bootInfo->font);
+	Console c = Console(&p);
 
-	for (int i = 0; i < 50; i++) {
-		br.PrintStr("It's a kernel!");
+	// Print some information about the system
+	c.ForegroundColor = 0xFF00FF00;
+	c.PrintLine("[System Info]");
+	c.Print("Screen Width: ");
+	c.PrintLine(to_string((uint64_t)bootInfo->fb->Width));
+	c.Print("Screen Height: ");
+	c.PrintLine(to_string((uint64_t)bootInfo->fb->Height));
+	c.PrintLine("");
+	c.ForegroundColor = 0xFFFFFFFF;
+
+	for (int i = 0; i < 40; i++) {
+		c.Print("Number: ");
+		c.PrintLine(to_string((int64_t)i));
 	}
-
-	br.CursorPosition = {0, br.CursorPosition.Y + 32};
-	br.PrintStr(to_string((uint64_t)1003892));
-
-	br.CursorPosition = {0, br.CursorPosition.Y + 16};
-	br.PrintStr(to_string((int64_t)-1003892));
-
-	br.CursorPosition = {0, br.CursorPosition.Y + 16};
-	br.PrintStr(to_string((double)37.1337));
-
-	br.CursorPosition = {0, br.CursorPosition.Y + 16};
-	br.PrintStr(to_string((double)-37.1337));
-
-	br.CursorPosition = {0, br.CursorPosition.Y + 16};
-	br.PrintStr(to_hstring((uint64_t)0x1234ABCD));
-
-	br.CursorPosition = {0, br.CursorPosition.Y + 16};
-	br.PrintStr(to_hstring((uint32_t)0x1234ABCDF0F0));
 
 	for (;;) { __asm__("cli; hlt"); } // Halt the system
 	return;
