@@ -7,9 +7,19 @@ CXX			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-g++
 # LD shouldn't be invoked... perhaps remove this...
 LD			:= $(ABSCURDIR)/Tools/Cross/bin/x86_64-elf-ld
 
-# there was an -fpic flag, but it was removed
-# is -std=c11 
+# CLAGS had -fpic and -std=c11, but they were removed
 CFLAGS		:= -ffreestanding -fshort-wchar -mno-red-zone -flto -MMD -MP -Wall -Wextra -I$(SHARED)
 CXXFLAGS	:= -ffreestanding -fshort-wchar -mno-red-zone -flto -MMD -MP -Wall -Wextra -I$(SHARED)
-# max-page-size: https://stackoverflow.com/a/64808242/5638389, reduces ELF size
-LDFLAGS		:= -static -Bsymbolic -nostdlib -Wl,-z,max-page-size=4096
+
+# ELF size appears to be unusually large when using this toolchain (but not makefiles!)
+# Compiling others' ELFs with this toolchain results in unusally large ELFs too :/
+# According to https://stackoverflow.com/q/46916112, the architecture's (x86_64) maximum page size is 2MB,
+# which the toolchain appears to default to, as a minimal ELF is around ~2.1MB
+
+# max-page-size: https://stackoverflow.com/a/64808242, reduces ELF size
+# -Wl,-z,max-page-size=4096
+# The above statement breaks the program when something like the following is declared:
+# const char* testr[] {
+# 	"testing"
+# };
+LDFLAGS		:= -static -Bsymbolic -nostdlib -Wl,-z,max-page-size=8192
