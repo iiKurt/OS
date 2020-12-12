@@ -115,6 +115,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 	bootInfo.fb = fb;
 	bootInfo.font = font;
 	bootInfo.mMap = Map;
+	bootInfo.mMapSize = MapSize;
 	bootInfo.mMapDescriptorSize = DescriptorSize;
 	
 	// System will crash after this point if we use any EFI services
