@@ -18,11 +18,20 @@ HDD			:= $(BUILDDIR)/HDD
 EMU			:= qemu-system-x86_64
 # was using -M accel=kvm:tcg
 EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -M accel=tcg -net none -serial stdio
+ISO			:= $(BUILDDIR)/OS.iso
 
-# executes the emulator
-.PHONY: execute
-execute: hdd $(OVMF) 
+# run the emulator
+.PHONY: run
+run: hdd $(OVMF) 
 	@$(EMU) $(EMUFLAGS)
+
+# Create an ISO image from the HDD folder
+.PHONY: image
+image: hdd
+# Only works on macOS for the time being...
+# Virtualbox may not automatically detect the .EFI file, so it needs to be run manually
+# Not sure if it's virtualbox's problem or the ISO's problem
+	hdiutil makehybrid -iso -joliet $(HDD) -o $(ISO)
 
 # construct the drive used by the emulator
 .PHONY: hdd

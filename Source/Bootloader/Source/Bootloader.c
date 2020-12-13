@@ -118,6 +118,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 	bootInfo.mMapSize = MapSize;
 	bootInfo.mMapDescriptorSize = DescriptorSize;
 	
+	// Disable the watchdog timer just in case
+	SystemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
 	// System will crash after this point if we use any EFI services
 	SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
 
