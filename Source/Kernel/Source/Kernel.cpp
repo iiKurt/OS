@@ -1,9 +1,9 @@
 #include <BootInfo.h>
 
-#include "Painter.hpp"
-#include "Console.hpp"
+#include "Graphics/Painter.hpp"
+#include "Graphics/Console.hpp"
+#include "Memory/EFIMemory.hpp"
 #include "String.hpp"
-#include "EFIMemory.hpp"
 
 extern "C" void _start(BootInfo* bootInfo) {
 	Painter p = Painter(bootInfo->fb, bootInfo->font);
