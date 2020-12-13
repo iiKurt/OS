@@ -18,6 +18,8 @@ OBJECTS			:= \
 	Graphics/Painter.o \
 	Graphics/Console.o \
 	Memory/EFIMemory.o \
+	Memory/Memory.o \
+	Bitmap.o \
 	String.o
 
 # prepend BUILDDIR to each object file
