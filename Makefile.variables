@@ -22,4 +22,4 @@ CXXFLAGS	:= -ffreestanding -fshort-wchar -mno-red-zone -flto -MMD -MP -Wall -Wex
 # const char* testr[] {
 # 	"testing"
 # };
-LDFLAGS		:= -static -Bsymbolic -nostdlib -Wl,-z,max-page-size=8192
+LDFLAGS		:= -static -Bsymbolic -nostdlib

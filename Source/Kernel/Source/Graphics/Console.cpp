@@ -4,7 +4,7 @@ Console::Console(Painter* painter) {
 	this->painter = painter;
 	this->cursorPosition = {0, 0};
 	this->ForegroundColor = 0xFFFFFFFF;
-	this->BackgroundColor = 0x00000000;
+	this->BackgroundColor = 0xFF000000;
 }
 
 void Console::Print(const char* str) {
@@ -29,5 +29,7 @@ void Console::PrintLine(const char* str) {
 }
 
 void Console::Clear() {
+	cursorPosition.X = 0;
+	cursorPosition.Y = 0;
 	painter->DrawFilledRectangle(0, 0, painter->FB->Width, painter->FB->Height, BackgroundColor);
 }
