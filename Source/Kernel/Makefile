@@ -19,6 +19,7 @@ OBJECTS			:= \
 	Graphics/Console.o \
 	Memory/EFIMemory.o \
 	Memory/Memory.o \
+	Memory/PageFrameAllocator.o \
 	Bitmap.o \
 	String.o
 
