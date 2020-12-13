@@ -13,3 +13,6 @@ Bootloader:
 	make Bootloader makefile independent of makefile.variables? This involves:
 		Copying relevant CFLAGS from https://wiki.osdev.org/User:No92/UEFI_Bare_Bones to the makefile
 		Deleting all the CFLAGS in makefile.variables and replacing it with poncho's
+
+Kernel:
+	Print a buildstamp on boot (build stamp of whole OS or just kernel?)
