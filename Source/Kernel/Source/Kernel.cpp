@@ -3,7 +3,11 @@
 #include "Graphics/Painter.hpp"
 #include "Graphics/Console.hpp"
 #include "Memory/EFIMemory.hpp"
+#include "Memory/Memory.hpp"
 #include "String.hpp"
+#include "Bitmap.hpp"
+
+uint8_t testBuffer[20];
 
 extern "C" void _start(BootInfo* bootInfo) {
 	Painter p = Painter(bootInfo->fb, bootInfo->font);
@@ -20,27 +24,25 @@ extern "C" void _start(BootInfo* bootInfo) {
 	c.PrintLine("");
 	c.ForegroundColor = 0xFFFFFFFF;
 
-	// Print EFI memory sections
+	Bitmap testBitmap;
+	testBitmap.Buffer = &testBuffer[0];
+	testBitmap.Set(0, false);
+	testBitmap.Set(1, true);
+	testBitmap.Set(2, false);
+	testBitmap.Set(3, false);
+	testBitmap.Set(4, true);
+	testBitmap.Set(16, true);
+
+	for (int i = 0; i < 20; i++) {
+		c.PrintLine(testBitmap[i] ? "true" : "false");
+	}
+
 	// Number of map entries
 	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescriptorSize;
 
-	// Iterate through each map entry
-	for (unsigned int i = 0; i < mMapEntries; i++) {
-		// Get the descriptor at an offset to the memory map
-		EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)((uint64_t)bootInfo->mMap + (i * bootInfo->mMapDescriptorSize));
-		
-		// Print the corrosponding type string to the console
-		c.Print(EFI_MEMORY_TYPE_STRINGS[desc->type]);
-		c.ForegroundColor = 0xFFFF00FF;
-		c.Print(" ");
-		// pageCount is the number of 4KiB pages
-		// Calculate how many KiBs by multiplying by 4
-		c.Print(to_string(desc->pageCount << 2));
-		// Do ((pageCount * 4) * 1024)/1000 to calculate kB
-		// Or ((pageCount * 4096)/1000)
-		c.PrintLine(" KiB");
-		c.ForegroundColor = 0xFFFFFFFF;
-	}
+	c.Print(to_string(GetMemorySize(bootInfo->mMap, mMapEntries, bootInfo->mMapDescriptorSize)));
+	c.PrintLine(" bytes");
+
 
 	for (;;) { __asm__("cli; hlt"); } // Halt the system
 	return;

@@ -1,5 +1,5 @@
 Generic:
-	Formatting style/naming convention of function names and class memeber variables
+	Formatting style/naming convention of function names and class member variables
 
 Makefiles:
 	a todo target showing all todos in source files
@@ -10,6 +10,6 @@ Makefiles:
 
 Bootloader:
 	Possibily make the EFI SystemTable a global variable?
-	make Bootloader makefile independent of makefile.variables. This involves:
+	make Bootloader makefile independent of makefile.variables? This involves:
 		Copying relevant CFLAGS from https://wiki.osdev.org/User:No92/UEFI_Bare_Bones to the makefile
 		Deleting all the CFLAGS in makefile.variables and replacing it with poncho's

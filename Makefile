@@ -1,5 +1,3 @@
-# Based off: https://wiki.osdev.org/User:No92/UEFI_Bare_Bones
-
 include ./Makefile.variables
 
 SOURCEDIR	:= ./Source
@@ -17,7 +15,7 @@ OVMF		:= $(TOOLSDIR)/OVMF.fd
 HDD			:= $(BUILDDIR)/HDD
 EMU			:= qemu-system-x86_64
 # was using -M accel=kvm:tcg
-EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -M accel=tcg -net none -serial stdio
+EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -m 256M -M accel=tcg -net none -serial stdio
 ISO			:= $(BUILDDIR)/OS.iso
 
 # run the emulator
@@ -29,6 +27,9 @@ run: hdd $(OVMF)
 .PHONY: image
 image: hdd
 # Only works on macOS for the time being...
+# Could create a blank fat32 image and then mount to folder and copy files:
+# https://github.com/procount/fat32images/blob/master/createfat32
+
 # Virtualbox may not automatically detect the .EFI file, so it needs to be run manually
 # Not sure if it's virtualbox's problem or the ISO's problem
 	hdiutil makehybrid -iso -joliet $(HDD) -o $(ISO)
