@@ -3,7 +3,6 @@
 #include "Painter.hpp"
 
 // TODO: scroll mode, overwrite from top or scroll existing lines? (will have to fill and rewrite screen)
-// TODO: overwrite mode or fill screen with bg color?
 
 class Console {
 private:

@@ -15,10 +15,10 @@ KERNEL			:= $(BUILDDIR)/Kernel.elf
 
 OBJECTS			:= \
 	Kernel.o \
-	Painter.o \
-	Console.o \
-	String.o \
-	EFIMemory.o
+	Graphics/Painter.o \
+	Graphics/Console.o \
+	Memory/EFIMemory.o \
+	String.o
 
 # prepend BUILDDIR to each object file
 OBJECTS			:= $(addprefix $(BUILDDIR)/, $(OBJECTS))
