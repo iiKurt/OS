@@ -6,8 +6,7 @@
 #include "Memory/Memory.hpp"
 #include "String.hpp"
 #include "Bitmap.hpp"
-
-uint8_t testBuffer[20];
+#include "Memory/PageFrameAllocator.hpp"
 
 extern "C" void _start(BootInfo* bootInfo) {
 	Painter p = Painter(bootInfo->fb, bootInfo->font);
@@ -23,19 +22,6 @@ extern "C" void _start(BootInfo* bootInfo) {
 	c.PrintLine(to_string((uint64_t)bootInfo->fb->Height));
 	c.PrintLine("");
 	c.ForegroundColor = 0xFFFFFFFF;
-
-	Bitmap testBitmap;
-	testBitmap.Buffer = &testBuffer[0];
-	testBitmap.Set(0, false);
-	testBitmap.Set(1, true);
-	testBitmap.Set(2, false);
-	testBitmap.Set(3, false);
-	testBitmap.Set(4, true);
-	testBitmap.Set(16, true);
-
-	for (int i = 0; i < 20; i++) {
-		c.PrintLine(testBitmap[i] ? "true" : "false");
-	}
 
 	// Number of map entries
 	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescriptorSize;
