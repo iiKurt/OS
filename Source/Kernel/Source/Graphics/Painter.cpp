@@ -6,8 +6,8 @@ Painter::Painter(Framebuffer* fb, PSF1_FONT* font) {
 }
 
 // Voodoo magic ahead
-void Painter::PrintCharacter(char chr, unsigned int xOff, unsigned int yOff, unsigned int primaryColor, unsigned int secondaryColor) {
-	// here may be a better way to detect/implement transparency
+void Painter::PrintCharacter(char chr, unsigned int xOff, unsigned int yOff, uint32_t primaryColor, uint32_t secondaryColor) {
+	// There may be a better way to detect/implement transparency
 	char isTransparent = 0;
 
 	if ((secondaryColor >> 24) == 0x00) { // Alpha channel is zero
@@ -49,10 +49,49 @@ void Painter::PrintString(const char* str, unsigned int x, unsigned int y) {
 	}
 }
 
-void Painter::DrawFilledRectangle(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color) {
-	for (unsigned int i = 0; i < w; i++) {
-		for (unsigned int j = 0; j < h; j++) {
-			*(unsigned int*)((unsigned int*)FB->BaseAddress + (x + i) + ((y + j) * FB->PixelsPerScanLine)) = color;
+// https://stackoverflow.com/a/41095728
+// Big WTF
+inline uint32_t rgba_interp(uint32_t src, uint32_t dst, uint32_t t) {
+	const uint32_t s = 256 - t;
+	return (
+		(((((src >> 0)  & 0xff) * s +
+		   ((dst >> 0)  & 0xff) * t) >> 8)) |
+		(((((src >> 8)  & 0xff) * s +
+		   ((dst >> 8)  & 0xff) * t)     )  & ~0xff) |
+		(((((src >> 16) & 0xff) * s +
+		   ((dst >> 16) & 0xff) * t) << 8)  & ~0xffff) |
+		(((((src >> 24) & 0xff) * s +
+		   ((dst >> 24) & 0xff) * t) << 16) & ~0xffffff)
+	);
+}
+
+void Painter::DrawFilledRectangle(unsigned int xOff, unsigned int yOff, unsigned int w, unsigned int h, uint32_t color) {
+	for (unsigned int x = 0; x < w; x++) {
+		for (unsigned int y = 0; y < h; y++) {
+			*(unsigned int*)((unsigned int*)FB->BaseAddress + (xOff + x) + ((yOff + y) * FB->PixelsPerScanLine)) = color;
+		}
+	}
+}
+
+// TODO: What if no FPU?
+void Painter::DrawGradientRectangle(unsigned int xOff, unsigned int yOff, unsigned int w, unsigned int h,
+                                    uint32_t sourceColor, uint32_t destinationColor, Orientation orientation) {
+	uint32_t color = 0x00000000;
+
+	// Compiler may optimise this: https://stackoverflow.com/q/1462710
+	for (unsigned int x = 0; x < w; x++) {
+		for (unsigned int y = 0; y < h; y++) {
+			if (orientation == Orientation::Vertical) {
+				// Fun math descibed here: https://stackoverflow.com/a/5732390
+				// TODO: Could this be bitshifted?
+				color = rgba_interp(sourceColor, destinationColor, ((double)256/(double)h) * y);
+			}
+			else if (orientation == Orientation::Horizontal) {
+				color = rgba_interp(sourceColor, destinationColor, ((double)256/(double)w) * x);
+			}
+			
+			*(unsigned int*)((unsigned int*)FB->BaseAddress + (xOff + x) + ((yOff + y) * FB->PixelsPerScanLine))
+			 = color;
 		}
 	}
 }

@@ -1,6 +1,7 @@
 #include "String.hpp"
 
 char stringOutput[128];
+
 // TODO: perhaps somehow combine both uint64 and int64 to_string logic
 const char* to_string(uint64_t value) {
 	uint8_t size;
@@ -97,7 +98,6 @@ const char* to_string(double value, uint8_t decimalPlaces) {
 }
 
 const char* generic_to_hex_string(uint8_t* valPtr, uint8_t size) {
-
 	size -= 1;
 	uint8_t* ptr;
 	uint8_t temp;

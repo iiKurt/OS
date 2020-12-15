@@ -4,7 +4,7 @@ Console::Console(Painter* painter) {
 	this->painter = painter;
 	this->cursorPosition = {0, 0};
 	this->ForegroundColor = 0xFFFFFFFF;
-	this->BackgroundColor = 0xFF000000;
+	this->BackgroundColor = 0x00000000;
 }
 
 void Console::Print(const char* str) {
@@ -28,8 +28,17 @@ void Console::PrintLine(const char* str) {
 	cursorPosition.Y += 16;
 }
 
-void Console::Clear() {
+void Console::Reset() {
 	cursorPosition.X = 0;
 	cursorPosition.Y = 0;
+}
+
+void Console::Clear() {
+	Reset();
 	painter->DrawFilledRectangle(0, 0, painter->FB->Width, painter->FB->Height, BackgroundColor);
+}
+
+void Console::Clear(uint32_t sourceColor, uint32_t destinationColor) {
+	Reset();
+	painter->DrawGradientRectangle(0, 0, painter->FB->Width, painter->FB->Height, sourceColor, destinationColor);
 }

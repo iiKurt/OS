@@ -16,7 +16,7 @@ extern "C" void _start(BootInfo* bootInfo) {
 	Painter p = Painter(bootInfo->fb, bootInfo->font);
 	Console c = Console(&p);
 
-	c.Clear();
+	c.Clear(0xFF000000, 0xFF0000FF);
 	// Print some information about the system
 	c.ForegroundColor = 0xFF00FF00;
 	c.PrintLine("[System Info]");
@@ -35,6 +35,13 @@ extern "C" void _start(BootInfo* bootInfo) {
 
 	allocator.LockPages(&_KernelStart, kernelPages);
 
+	// Number of map entries
+	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescriptorSize;
+
+	c.Print("Total Memory: ");
+	c.Print(to_string(GetMemorySize(bootInfo->mMap, mMapEntries, bootInfo->mMapDescriptorSize) / 1024));
+	c.PrintLine(" KB");
+
 	c.Print("Free RAM: ");
 	c.Print(to_string(allocator.GetFreeRAM() / 1024));
 	c.PrintLine(" KB");
@@ -47,16 +54,12 @@ extern "C" void _start(BootInfo* bootInfo) {
 	c.Print(to_string(allocator.GetReservedRAM() / 1024));
 	c.PrintLine(" KB");
 
+	c.PrintLine("");
+
 	for (int i = 0; i < 20; i++) {
 		void* address = allocator.RequestPage();
 		c.PrintLine(to_hex_string((uint64_t)address));
 	}
-
-	// Number of map entries
-	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescriptorSize;
-
-	c.Print(to_string(GetMemorySize(bootInfo->mMap, mMapEntries, bootInfo->mMapDescriptorSize)));
-	c.PrintLine(" bytes");
 
 	for (;;) { __asm__("cli; hlt"); } // Halt the system
 	return;

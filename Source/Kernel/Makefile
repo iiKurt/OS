@@ -7,7 +7,7 @@ BUILDDIR		:= Build
 SOURCEDIR		:= Source
 
 # Extend the makefile.variables
-#CFLAGS			+=
+#CXXFLAGS		+= -O1
 LDFLAGS			+= -T Kernel.ld
 
 # output binary path

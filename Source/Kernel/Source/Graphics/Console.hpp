@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 #include "Painter.hpp"
 
 // TODO: scroll mode, overwrite from top or scroll existing lines? (will have to fill and rewrite screen)
@@ -17,5 +19,7 @@ public:
 
 	void Print(const char* str);
 	void PrintLine(const char* str);
+	void Reset();
 	void Clear();
+	void Clear(uint32_t sourceColor, uint32_t destinationColor);
 };
