@@ -36,6 +36,7 @@ int ReadKernel(EFI_SYSTEM_TABLE* SystemTable, EFI_FILE_PROTOCOL* Kernel, Elf64_E
 		switch (phdr->p_type){
 			case PT_LOAD:
 			{
+				// Hardcoded kernel load location at 0x1000?
 				int pages = (phdr->p_memsz + 0x1000 - 1) / 0x1000;
 				Elf64_Addr segment = phdr->p_paddr;
 				SystemTable->BootServices->AllocatePages(AllocateAddress, EfiLoaderData, pages, &segment);
