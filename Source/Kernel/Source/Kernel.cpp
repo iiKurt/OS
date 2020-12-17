@@ -21,9 +21,9 @@ extern "C" void _start(BootInfo* bootInfo) {
 	c.ForegroundColor = 0xFF00FF00;
 	c.PrintLine("[System Info]");
 	c.Print("Screen Width: ");
-	c.PrintLine(to_string((uint64_t)bootInfo->fb->Width));
+	c.PrintLine(to_string(bootInfo->fb->Width));
 	c.Print("Screen Height: ");
-	c.PrintLine(to_string((uint64_t)bootInfo->fb->Height));
+	c.PrintLine(to_string(bootInfo->fb->Height));
 	c.PrintLine("");
 	c.ForegroundColor = 0xFFFFFFFF;
 
@@ -58,7 +58,7 @@ extern "C" void _start(BootInfo* bootInfo) {
 
 	for (int i = 0; i < 20; i++) {
 		void* address = allocator.RequestPage();
-		c.PrintLine(to_hex_string((uint64_t)address));
+		c.PrintLine(to_string((int64_t)address, 16, 16));
 	}
 
 	for (;;) { __asm__("cli; hlt"); } // Halt the system

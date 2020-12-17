@@ -1,7 +1,11 @@
 Generic:
-	Formatting style/naming convention of function names and class member variables
+	Formatting guidelines
+		Style/naming convention of function names and class member variables
+		Comment formatting
+			Start comment with captial and space after the //, end with .
+			/* must have newline after, */ must have newline before
 	Unit testing
-	Fix code that is broken by optimizations
+	Move away from deprecated std headers, will mean prefixing a few things with std::
 
 Makefiles:
 	a todo target showing all todos in source files
