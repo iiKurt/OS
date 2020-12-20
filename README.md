@@ -17,5 +17,6 @@ Operating System
     - You may delete any redundant directories from ./Tools
 2. Run `make`
     - The OS will be built
+    - A raw disk image will be created at ./Build/OS.img
     - OVMF will be downloaded to ./Tools/OVMF.fd
     - Emulation will begin in QEMU
