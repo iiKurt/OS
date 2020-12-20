@@ -32,13 +32,16 @@ $(IMG):
 	@dd if=/dev/zero of=$(IMG) bs=512 count=93750 2>/dev/null
 
 # Formats and copies files to disk image.
+# Note that VirtualBox doesn't like this. Use 'VBoxManage convertdd' to make a bootable .vdi.
+# https://stackoverflow.com/a/57432808
+# https://unix.stackexchange.com/a/617506
 .PHONY: image
 image: shared bootloader kernel $(IMG)
 # Create paths for the EFI and OS partitions to be mounted to.
 	@mkdir -p $(EFIMOUNT)
 	@mkdir -p $(OSMOUNT)
 
-# For macOS
+# For macOS.
 ifeq ($(UNAME), Darwin)
 # Create two partitions, one EFI (ef00) and the other a basic data (0700).
 	sgdisk -o -n 1:0:+10M -t 1:ef00 -n 2:0:0 -t 2:0700 $(IMG) 2>/dev/null
