@@ -12,27 +12,53 @@ OVMF_URL	:= https://dl.bintray.com/no92/vineyard-binary/OVMF.fd
 OVMF		:= $(TOOLSDIR)/OVMF.fd
 
 # QEMU
-HDD			:= $(BUILDDIR)/HDD
+IMG			:= $(BUILDDIR)/OS.img
 EMU			:= qemu-system-x86_64
 # Was using -M accel=kvm:tcg
-EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -m 256M -M accel=tcg -net none -serial stdio
-IMG			:= $(BUILDDIR)/OS.img
+EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=$(IMG) -m 256M -M accel=tcg -net none -serial stdio
 
 MOUNTDIR	:= $(BUILDDIR)/Mount
 EFIMOUNT	:= $(MOUNTDIR)/EFI
 OSMOUNT		:= $(MOUNTDIR)/OS
 
+# TODO: Silence endless garbage that disk image related rules output.
+
+################
+# Common tasks #
+################
+
+.PHONY: default
+default: image run
+
 # Run the emulator.
 .PHONY: run
-run: hdd $(OVMF) 
+run: $(IMG) $(OVMF)
 	@$(EMU) $(EMUFLAGS)
 
-# Creates empty disk image when required.
-$(IMG):
-	@dd if=/dev/zero of=$(IMG) bs=512 count=93750 2>/dev/null
+# Deletes ('cleans') the build directory, and runs the clean command on other components.
+.PHONY: clean
+clean:
+	-@$(RM) -rf $(BUILDDIR)
+# Clean bootloader.
+	@$(MAKE) -C $(SOURCEDIR)/Bootloader clean
+# Clean kernel.
+	@$(MAKE) -C $(SOURCEDIR)/Kernel clean
 
-# Formats and copies files to disk image.
-# Note that VirtualBox doesn't like this. Use 'VBoxManage convertdd' to make a bootable .vdi.
+######################
+# Construct OS image #
+######################
+
+# Creates empty disk image when required.
+# TODO: Confusing rules: $(IMG) and image.
+$(IMG):
+	@mkdir -p $(BUILDDIR)
+# Create the empty disk image.
+	@dd if=/dev/zero of=$(IMG) bs=512 count=93750 2>/dev/null
+# Create two partitions, one EFI (ef00) and the other a basic data (0700).
+	@sgdisk -o -n 1:0:+10M -t 1:ef00 -n 2:0:0 -t 2:0700 $(IMG) 2>/dev/null
+
+# Formats and copies files to a raw disk image.
+# Note that VirtualBox doesn't like raw disk images. Use 'VBoxManage convertdd' to make a bootable .vdi.
 # https://stackoverflow.com/a/57432808
 # https://unix.stackexchange.com/a/617506
 .PHONY: image
@@ -43,19 +69,17 @@ image: shared bootloader kernel $(IMG)
 
 # For macOS.
 ifeq ($(UNAME), Darwin)
-# Create two partitions, one EFI (ef00) and the other a basic data (0700).
-	sgdisk -o -n 1:0:+10M -t 1:ef00 -n 2:0:0 -t 2:0700 $(IMG) 2>/dev/null
 # Bash script - can't have comments here without makefile breaking. Summary:
 # Attach the image without mounting a filesystem, also grab the device node path.
 # Format EFI partition as FAT16 (because smaller minimum size).
 # Format OS partition as FAT32.
 # Mount the filsystems.
-	set -e;\
-	device=$$(hdiutil attach -nomount -nobrowse "$(IMG)" | egrep '^/dev/' | sed 1q | awk '{print $$1}');\
-	newfs_msdos -F 16 -v EFI "$${device}s1";\
-	newfs_msdos -F 32 -v OS "$${device}s2";\
-	mount -t msdos "$${device}"s1 $(EFIMOUNT);\
-	mount -t msdos "$${device}"s2 $(OSMOUNT);
+	@set -e;\
+	device=$$(hdiutil attach -nomount -nobrowse "$(IMG)" | egrep '^/dev/' | sed 1q | awk '{print $$1}') 2>/dev/null;\
+	newfs_msdos -F 16 -v EFI "$${device}s1" 2>/dev/null;\
+	newfs_msdos -F 32 -v OS "$${device}s2" 2>/dev/null;\
+	mount -t msdos "$${device}"s1 $(EFIMOUNT) 2>/dev/null;\
+	mount -t msdos "$${device}"s2 $(OSMOUNT) 2>/dev/null;
 endif
 
 # Copy the files
@@ -66,7 +90,7 @@ endif
 
 ifeq ($(UNAME), Darwin)
 # Only need to detach one partition for the whole disk to be unmounted apparently.
-	hdiutil detach $(EFIMOUNT)
+	@hdiutil detach $(EFIMOUNT)
 #hdiutil detach $(OSMOUNT)
 endif
 
@@ -74,15 +98,6 @@ endif
 $(OVMF):
 	@mkdir -p $(TOOLSDIR)
 	wget $(OVMF_URL) -O $(OVMF) -qq
-
-# Deletes ('cleans') the build directory, and runs the clean command on other components.
-.PHONY: clean
-clean:
-	-@$(RM) -rf $(BUILDDIR)
-# Clean bootloader.
-	@$(MAKE) -C $(SOURCEDIR)/Bootloader clean
-# Clean kernel.
-	@$(MAKE) -C $(SOURCEDIR)/Kernel clean
 
 ####################
 # Build components #
