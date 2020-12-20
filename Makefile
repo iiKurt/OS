@@ -5,7 +5,7 @@ BUILDDIR	:= ./Build
 TOOLSDIR	:= ./Tools
 BUNDLEDDIR	:= ./Bundled
 
-# pro tip: don't indent comments or have comments inline with a command
+# Pro tip: don't indent comments or have comments inline with a command.
 
 # OVMF firmware
 OVMF_URL	:= https://dl.bintray.com/no92/vineyard-binary/OVMF.fd
@@ -14,46 +14,71 @@ OVMF		:= $(TOOLSDIR)/OVMF.fd
 # QEMU
 HDD			:= $(BUILDDIR)/HDD
 EMU			:= qemu-system-x86_64
-# was using -M accel=kvm:tcg
+# Was using -M accel=kvm:tcg
 EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -m 256M -M accel=tcg -net none -serial stdio
-ISO			:= $(BUILDDIR)/OS.iso
+IMG			:= $(BUILDDIR)/OS.img
 
-# run the emulator
+MOUNTDIR	:= $(BUILDDIR)/Mount
+EFIMOUNT	:= $(MOUNTDIR)/EFI
+OSMOUNT		:= $(MOUNTDIR)/OS
+
+# Run the emulator.
 .PHONY: run
 run: hdd $(OVMF) 
 	@$(EMU) $(EMUFLAGS)
 
-# Create an ISO image from the HDD folder
+# Creates empty disk image when required.
+$(IMG):
+	@dd if=/dev/zero of=$(IMG) bs=512 count=93750 2>/dev/null
+
+# Formats and copies files to disk image.
 .PHONY: image
-image: hdd
-# Only works on macOS for the time being...
-# Could create a blank fat32 image and then mount to folder and copy files:
-# https://github.com/procount/fat32images/blob/master/createfat32
+image: shared bootloader kernel $(IMG)
+# Create paths for the EFI and OS partitions to be mounted to.
+	@mkdir -p $(EFIMOUNT)
+	@mkdir -p $(OSMOUNT)
 
-# Virtualbox may not automatically detect the .EFI file, so it needs to be run manually
-# Not sure if it's virtualbox's problem or the ISO's problem
-	hdiutil makehybrid -iso -joliet $(HDD) -o $(ISO)
+# For macOS
+ifeq ($(UNAME), Darwin)
+# Create two partitions, one EFI (ef00) and the other a basic data (0700).
+	sgdisk -o -n 1:0:+10M -t 1:ef00 -n 2:0:0 -t 2:0700 $(IMG) 2>/dev/null
+# Bash script - can't have comments here without makefile breaking. Summary:
+# Attach the image without mounting a filesystem, also grab the device node path.
+# Format EFI partition as FAT16 (because smaller minimum size).
+# Format OS partition as FAT32.
+# Mount the filsystems.
+	set -e;\
+	device=$$(hdiutil attach -nomount -nobrowse "$(IMG)" | egrep '^/dev/' | sed 1q | awk '{print $$1}');\
+	newfs_msdos -F 16 -v EFI "$${device}s1";\
+	newfs_msdos -F 32 -v OS "$${device}s2";\
+	mount -t msdos "$${device}"s1 $(EFIMOUNT);\
+	mount -t msdos "$${device}"s2 $(OSMOUNT);
+endif
 
-# construct the drive used by the emulator
-.PHONY: hdd
-hdd: shared bootloader kernel
-	@mkdir -p $(HDD)/efi/boot
-	@cp $(SOURCEDIR)/Bootloader/Build/bootx64.efi $(HDD)/efi/boot/bootx64.efi
-	@cp $(SOURCEDIR)/Kernel/Build/Kernel.elf $(HDD)/Kernel.elf
-	@cp $(BUNDLEDDIR)/zap-light16.psf $(HDD)/zap-light16.psf
+# Copy the files
+	@mkdir -p $(EFIMOUNT)/efi/boot
+	@cp $(SOURCEDIR)/Bootloader/Build/bootx64.efi $(EFIMOUNT)/efi/boot/bootx64.efi
+	@cp $(SOURCEDIR)/Kernel/Build/Kernel.elf $(EFIMOUNT)/Kernel.elf
+	@cp $(BUNDLEDDIR)/zap-light16.psf $(EFIMOUNT)/zap-light16.psf
 
-# downloads OVMF
+ifeq ($(UNAME), Darwin)
+# Only need to detach one partition for the whole disk to be unmounted apparently.
+	hdiutil detach $(EFIMOUNT)
+#hdiutil detach $(OSMOUNT)
+endif
+
+# Downloads OVMF.
 $(OVMF):
 	@mkdir -p $(TOOLSDIR)
 	wget $(OVMF_URL) -O $(OVMF) -qq
 
-# deletes ('cleans') the build directory, and runs the clean command on other components
+# Deletes ('cleans') the build directory, and runs the clean command on other components.
 .PHONY: clean
 clean:
 	-@$(RM) -rf $(BUILDDIR)
-# clean bootloader
+# Clean bootloader.
 	@$(MAKE) -C $(SOURCEDIR)/Bootloader clean
-# clean kernel
+# Clean kernel.
 	@$(MAKE) -C $(SOURCEDIR)/Kernel clean
 
 ####################
@@ -64,10 +89,10 @@ clean:
 shared:
 	@$(MAKE) -C $(SOURCEDIR)/Shared
 
-# make the bootloader
+# Make the bootloader.
 .PHONY: bootloader
 bootloader:
-# change directory first (-C) so makefile is in the context of its own diretory, instead of this one
+# Change directory first (-C) so makefile is in the context of its own diretory, instead of this one.
 	@$(MAKE) -C $(SOURCEDIR)/Bootloader
 
 .PHONY: kernel
