@@ -87,7 +87,7 @@ const char* to_string(int64_t number, unsigned int base, unsigned int desiredLen
 		}
 	}
 
-	// Detect if there is a gap between the start/prefix and digits
+	// Detect if there is a gap between the start/prefix and digits.
 	while (endPrefixes != current) {
 		*current-- = '0';
 	}
