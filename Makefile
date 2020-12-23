@@ -12,10 +12,11 @@ OVMF_URL	:= https://dl.bintray.com/no92/vineyard-binary/OVMF.fd
 OVMF		:= $(TOOLSDIR)/OVMF.fd
 
 # QEMU
+HDD			:= $(BUILDDIR)/HDD
 IMG			:= $(BUILDDIR)/OS.img
 EMU			:= qemu-system-x86_64
 # Was using -M accel=kvm:tcg
-EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=$(IMG) -m 256M -M accel=tcg -net none -serial stdio
+EMUFLAGS	:= -drive if=pflash,format=raw,file=$(OVMF) -drive format=raw,file=fat:rw:$(HDD) -m 256M -M accel=tcg -net none -serial stdio
 
 MOUNTDIR	:= $(BUILDDIR)/Mount
 EFIMOUNT	:= $(MOUNTDIR)/EFI
@@ -28,7 +29,7 @@ OSMOUNT		:= $(MOUNTDIR)/OS
 ################
 
 .PHONY: default
-default: image run
+default: hdd run
 
 # Run the emulator.
 .PHONY: run
@@ -48,6 +49,13 @@ clean:
 # Construct OS image #
 ######################
 
+.PHONY: hdd
+hdd: shared bootloader kernel
+	@mkdir -p $(HDD)/efi/boot
+	@cp $(SOURCEDIR)/Bootloader/Build/bootx64.efi $(HDD)/efi/boot/bootx64.efi
+	@cp $(SOURCEDIR)/Kernel/Build/Kernel.elf $(HDD)/Kernel.elf
+	@cp $(BUNDLEDDIR)/zap-light16.psf $(HDD)/zap-light16.psf
+
 # Creates empty disk image when required.
 # TODO: Confusing rules: $(IMG) and image.
 $(IMG):
@@ -62,7 +70,7 @@ $(IMG):
 # https://stackoverflow.com/a/57432808
 # https://unix.stackexchange.com/a/617506
 .PHONY: image
-image: shared bootloader kernel $(IMG)
+image: $(HDD) $(IMG)
 # Create paths for the EFI and OS partitions to be mounted to.
 	@mkdir -p $(EFIMOUNT)
 	@mkdir -p $(OSMOUNT)
@@ -82,11 +90,8 @@ ifeq ($(UNAME), Darwin)
 	mount -t msdos "$${device}"s2 $(OSMOUNT) 2>/dev/null;
 endif
 
-# Copy the files
-	@mkdir -p $(EFIMOUNT)/efi/boot
-	@cp $(SOURCEDIR)/Bootloader/Build/bootx64.efi $(EFIMOUNT)/efi/boot/bootx64.efi
-	@cp $(SOURCEDIR)/Kernel/Build/Kernel.elf $(EFIMOUNT)/Kernel.elf
-	@cp $(BUNDLEDDIR)/zap-light16.psf $(EFIMOUNT)/zap-light16.psf
+# Copy the files from the HDD to the disk image.
+	@cp -r $(HDD)/. $(EFIMOUNT)
 
 ifeq ($(UNAME), Darwin)
 # Only need to detach one partition for the whole disk to be unmounted apparently.
