@@ -6,7 +6,7 @@
 #include "Memory/Memory.hpp"
 #include "String.hpp"
 #include "Bitmap.hpp"
-#include "Memory/PageFrameAllocator.hpp"
+#include "Memory/Paging/PageFrameAllocator.hpp"
 
 // Used to get the size of the kernel, so we can reserve some memory for it
 extern uint64_t _KernelStart;
