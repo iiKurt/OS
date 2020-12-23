@@ -8,8 +8,8 @@ Generic:
 	Move away from deprecated std headers, will mean prefixing a few things with std::
 
 Makefiles:
+	have the path to makefile.variables be an environment variable so sub-makefiles don't need to do ../.. (makes calling sub-makefiles far easier, no -C option)
 	a todo target showing all todos in source files
-	an image target that creates a loadable disk image from the HDD folder
 	a release target that cleans and builds the OS with optimizations enabled
 	Master makefile - don't copy files if:
 		other makefiles return "up to date"
