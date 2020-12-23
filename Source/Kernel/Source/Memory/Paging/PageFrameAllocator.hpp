@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-#include "EFIMemory.hpp"
-#include "../Bitmap.hpp"
-#include "Memory.hpp"
+#include "../Memory.hpp"
+#include "../EFIMemory.hpp"
+#include "../../Bitmap.hpp"
 
 class PageFrameAllocator {
 private:
