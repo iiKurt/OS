@@ -3,14 +3,17 @@ Operating System
 
 ## Building
 ### Required Utilities
-- Clang (Used to compile EFI bootloader and cross compiler)
-- Make
-- QEMU (Or another emulator)
-- my-little-pony-expansion-pack-3
-- To create disk image:
-    - dd (For creating a blank disk image)
-    - sgdisk (gptfdisk) (For laying out said disk image)
-    - Some kind of filesystem formatter and disk image mounter (Currently hard coded to use OS X's hdiutil and newfs)
+
+| Utility                         | Category     | Notes                                                                  |
+|---------------------------------|--------------|------------------------------------------------------------------------|
+| Make                            | Build        |                                                                        |
+| Clang                           | Compilation  | Used to compile EFI Bootloader and cross compiler.                     |
+| QEMU                            | Execution    | Can use another emulator or run on real hardware.                      |
+| dd                              | Distrubution |                                                                        |
+| sgdisk                          | Distrubition | Component of the gptfdisk package, used to lay out disk image.         |
+| [A FAT32 filesystem formatter]  | Distrubution | Used to format the disk image. Currently hard coded as newfs_msdos.    |
+| [A disk image mounter]          | Distrubution | Used to copy files to the disk image. Currently hard coded as hdiutil. |
+| my-little-pony-expansion-pack-3 | ???          |                                                                        |
 
 ### Instructions
 1. Run ./Setup.sh to download and install a x86_64-elf cross compiler to ./Tools/Cross
