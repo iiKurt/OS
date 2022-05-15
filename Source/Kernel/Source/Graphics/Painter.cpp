@@ -82,8 +82,8 @@ void Painter::DrawGradientRectangle(unsigned int xOff, unsigned int yOff, unsign
 	for (unsigned int x = 0; x < w; x++) {
 		for (unsigned int y = 0; y < h; y++) {
 			if (orientation == Orientation::Vertical) {
-				// Fun math descibed here: https://stackoverflow.com/a/5732390
-				// TODO: Could this be bitshifted?
+				// Fun math described here: https://stackoverflow.com/a/5732390
+				// TODO: Could this be bit shifted?
 				color = rgba_interp(sourceColor, destinationColor, ((double)256/(double)h) * y);
 			}
 			else if (orientation == Orientation::Horizontal) {
@@ -95,3 +95,45 @@ void Painter::DrawGradientRectangle(unsigned int xOff, unsigned int yOff, unsign
 		}
 	}
 }
+
+/* Alternate gradient drawing algorithm
+void DrawGradientA(int x, int y, int w, int h, unsigned int color_start, unsigned int color_end, bool draw_horizontal)
+{
+	int off_a = (int)((color_end & 0xFF000000) >> 24) - (int)((color_start & 0xFF000000) >> 24);
+	int off_r = (int)((color_end & 0x00FF0000) >> 16) - (int)((color_start & 0x00FF0000) >> 16);
+	int off_g = (int)((color_end & 0x0000FF00) >> 8) - (int)((color_start & 0x0000FF00) >> 8);
+	int off_b = (int)((color_end & 0x000000FF)) - (int)((color_start & 0x000000FF));
+
+	int base_a = (int)((color_start & 0xFF000000) >> 24);
+	int base_r = (int)((color_start & 0x00FF0000) >> 16);
+	int base_g = (int)((color_start & 0x0000FF00) >> 8);
+	int base_b = (int)((color_start & 0x000000FF));
+
+	if(draw_horizontal)
+	{
+		int i, j;
+		for(i = y; i < y+h; i++)
+		{
+			for(j = x; j < x+w; j++)
+			{
+				float fhStep = (j - x) / (float)w;
+				uint32_t col_gradient = ((base_a + (int)(off_a*fhStep)) << 24) | ((base_r + (int)(off_r*fhStep)) << 16) | ((base_g + (int)(off_g*fhStep)) << 8) | (base_b + (int)(off_b*fhStep));
+
+				DrawPixelA(j, i, col_gradient);
+			}
+		}
+	}
+	else
+	{
+		int i, j;
+		for(i = y; i < y+h; i++)
+		{
+			float fhStep = (i - y) / (float)h;
+			uint32_t col_gradient = ((base_a + (int)(off_a*fhStep)) << 24) | ((base_r + (int)(off_r*fhStep)) << 16) | ((base_g + (int)(off_g*fhStep)) << 8) | (base_b + (int)(off_b*fhStep));
+
+			for(j = x; j < x+w; j++)
+				DrawPixelA(j, i, col_gradient);
+		}
+	}
+}
+*/
