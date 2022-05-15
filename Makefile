@@ -8,7 +8,6 @@ BUNDLEDDIR	:= ./Bundled
 # Pro tip: don't indent comments or have comments inline with a command.
 
 # OVMF firmware
-OVMF_URL	:= https://dl.bintray.com/no92/vineyard-binary/OVMF.fd
 OVMF		:= $(TOOLSDIR)/OVMF.fd
 
 # QEMU
@@ -29,7 +28,7 @@ OSMOUNT		:= $(MOUNTDIR)/OS
 ################
 
 .PHONY: default
-default: hdd run
+default: image run
 
 # Run the emulator.
 .PHONY: run
@@ -61,16 +60,16 @@ hdd: shared bootloader kernel
 $(IMG):
 	@mkdir -p $(BUILDDIR)
 # Create the empty disk image.
-	@dd if=/dev/zero of=$(IMG) bs=512 count=93750 2>/dev/null
+	@dd if=/dev/zero of=$(IMG) bs=512 count=93750 1>/dev/null
 # Create two partitions, one EFI (ef00) and the other a basic data (0700).
-	@sgdisk -o -n 1:0:+10M -t 1:ef00 -n 2:0:0 -t 2:0700 $(IMG) 2>/dev/null
+	@sgdisk -o -n 1:0:+10M -t 1:ef00 -n 2:0:0 -t 2:0700 $(IMG) 1>/dev/null
 
 # Formats and copies files to a raw disk image.
 # Note that VirtualBox doesn't like raw disk images. Use 'VBoxManage convertdd' to make a bootable .vdi.
 # https://stackoverflow.com/a/57432808
 # https://unix.stackexchange.com/a/617506
 .PHONY: image
-image: $(HDD) $(IMG)
+image: hdd $(IMG)
 # Create paths for the EFI and OS partitions to be mounted to.
 	@mkdir -p $(EFIMOUNT)
 	@mkdir -p $(OSMOUNT)
@@ -81,13 +80,13 @@ ifeq ($(UNAME), Darwin)
 # Attach the image without mounting a filesystem, also grab the device node path.
 # Format EFI partition as FAT16 (because smaller minimum size).
 # Format OS partition as FAT32.
-# Mount the filsystems.
+# Mount the filesystems.
 	@set -e;\
-	device=$$(hdiutil attach -nomount -nobrowse "$(IMG)" | egrep '^/dev/' | sed 1q | awk '{print $$1}') 2>/dev/null;\
-	newfs_msdos -F 16 -v EFI "$${device}s1" 2>/dev/null;\
-	newfs_msdos -F 32 -v OS "$${device}s2" 2>/dev/null;\
-	mount -t msdos "$${device}"s1 $(EFIMOUNT) 2>/dev/null;\
-	mount -t msdos "$${device}"s2 $(OSMOUNT) 2>/dev/null;
+	device=$$(hdiutil attach -nomount -nobrowse "$(IMG)" | egrep '^/dev/' | sed 1q | awk '{print $$1}') 1>/dev/null;\
+	newfs_msdos -F 16 -v EFI "$${device}s1" 1>/dev/null;\
+	newfs_msdos -F 32 -v OS "$${device}s2" 1>/dev/null;\
+	mount -t msdos "$${device}"s1 $(EFIMOUNT) 1>/dev/null;\
+	mount -t msdos "$${device}"s2 $(OSMOUNT) 1>/dev/null;
 endif
 
 # Copy the files from the HDD to the disk image.
@@ -98,11 +97,6 @@ ifeq ($(UNAME), Darwin)
 	@hdiutil detach $(EFIMOUNT)
 #hdiutil detach $(OSMOUNT)
 endif
-
-# Downloads OVMF.
-$(OVMF):
-	@mkdir -p $(TOOLSDIR)
-	wget $(OVMF_URL) -O $(OVMF) -qq
 
 ####################
 # Build components #

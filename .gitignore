@@ -1,6 +1,7 @@
 # Project specific ignores
-/Tools/
+/Tools/*
 **/Build/
+!Tools/OVMF.fd
 
 #####################################
 # General compilation/build ignores #
