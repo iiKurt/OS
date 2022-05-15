@@ -8,6 +8,7 @@ BUNDLEDDIR	:= ./Bundled
 # Pro tip: don't indent comments or have comments inline with a command.
 
 # OVMF firmware
+OVMF_URL	:= https://github.com/iiKurt/OS/blob/a7f9ebf831c3a0603cc6385fb1bf70a3b10d0274/Tools/OVMF.fd?raw=true
 OVMF		:= $(TOOLSDIR)/OVMF.fd
 
 # QEMU
@@ -97,6 +98,11 @@ ifeq ($(UNAME), Darwin)
 	@hdiutil detach $(EFIMOUNT)
 #hdiutil detach $(OSMOUNT)
 endif
+
+# Downloads OVMF.
+$(OVMF):
+	@mkdir -p $(TOOLSDIR)
+	wget $(OVMF_URL) -O $(OVMF) -qq
 
 ####################
 # Build components #
