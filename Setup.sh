@@ -1,7 +1,12 @@
+#!/bin/bash
 # Setup and download
 
 mkdir -p Tools
 cd Tools
+
+echo "=================="
+echo "[DOWNLOADING]: GCC"
+echo "=================="
 
 if [ ! -d "GCC" ]; then
 	wget -nc https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz -O GCC.tar.gz
@@ -10,12 +15,21 @@ if [ ! -d "GCC" ]; then
 	rm -rf GCC.tar.gz
 fi
 
+echo "======================="
+echo "[DOWNLOADING]: Binutils"
+echo "======================="
+
 if [ ! -d "Binutils" ]; then
 	wget -nc https://ftp.gnu.org/gnu/binutils/binutils-2.35.1.tar.gz -O Binutils.tar.gz
 	mkdir -p Binutils
 	tar -xzf Binutils.tar.gz -C Binutils --strip-components 1
 	rm -rf Binutils.tar.gz
 fi
+
+echo "============================"
+echo "[DOWNLOADED]: GCC & Binutils"
+echo "[BUILDING]:	GCC"
+echo "============================"
 
 # Build the cross compiler
 
@@ -38,7 +52,10 @@ cd Build-Binutils
 make
 make install
 
-echo "DONE: Binutils"
+echo "===================="
+echo "[BUILT]:    Binutils"
+echo "[BUILDING]: GCC"
+echo "===================="
 
 cd ..
 
@@ -65,5 +82,24 @@ make all-target-libgcc
 make install-gcc
 make install-target-libgcc
 
-# TODO:
-# ask user if they want to delete the Source and Building folders and just keep the binaries
+cd ..
+
+echo "============"
+echo "[BUILT]: GCC"
+echo "============"
+
+while true; do
+	read -r -p "Delete Source and Build folders used to build Binutils and GCC? [Y/n] " response
+	case "$response" in
+		[nN][oO]|[nN]) 
+			break
+			;;
+		[yY][eE][sS]|"")
+			rm -rf "Binutils" "Build-Binutils" "GCC" "Build-GCC"
+			break
+			;;
+		* )
+			echo "Please answer y or n (yes or no)."
+			;;
+	esac
+done

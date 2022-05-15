@@ -8,7 +8,6 @@ Generic:
 	Move away from deprecated std headers, will mean prefixing a few things with std::
 
 Setup script:
-	TODOs at bottom of file
 	use curl instead of wget
 
 Makefiles:
