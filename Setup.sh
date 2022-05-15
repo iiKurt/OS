@@ -67,5 +67,3 @@ make install-target-libgcc
 
 # TODO:
 # ask user if they want to delete the Source and Building folders and just keep the binaries
-# this means that the Tools folder will only have one item: the Cross folder
-# so maybe make $PREFIX just equal $BASEDIR

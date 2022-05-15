@@ -7,6 +7,10 @@ Generic:
 	Unit testing
 	Move away from deprecated std headers, will mean prefixing a few things with std::
 
+Setup script:
+	TODOs at bottom of file
+	use curl instead of wget
+
 Makefiles:
 	have the path to makefile.variables be an environment variable so sub-makefiles don't need to do ../.. (makes calling sub-makefiles far easier, no -C option)
 	a todo target showing all todos in source files
