@@ -51,8 +51,8 @@ clean:
 
 .PHONY: hdd
 hdd: shared bootloader kernel
-	@mkdir -p $(HDD)/efi/boot
-	@cp $(SOURCEDIR)/Bootloader/Build/bootx64.efi $(HDD)/efi/boot/bootx64.efi
+	@mkdir -p $(HDD)/EFI/BOOT
+	@cp $(SOURCEDIR)/Bootloader/Build/bootx64.efi $(HDD)/EFI/BOOT/bootx64.efi
 	@cp $(SOURCEDIR)/Kernel/Build/Kernel.elf $(HDD)/Kernel.elf
 	@cp $(BUNDLEDDIR)/zap-light16.psf $(HDD)/zap-light16.psf
 
@@ -115,7 +115,7 @@ shared:
 # Make the bootloader.
 .PHONY: bootloader
 bootloader:
-# Change directory first (-C) so makefile is in the context of its own diretory, instead of this one.
+# Change directory first (-C) so makefile is in the context of its own directory, instead of this one.
 	@$(MAKE) -C $(SOURCEDIR)/Bootloader
 
 .PHONY: kernel
