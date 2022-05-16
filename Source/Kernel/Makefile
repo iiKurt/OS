@@ -20,6 +20,8 @@ OBJECTS			:= \
 	Memory/EFIMemory.o \
 	Memory/Memory.o \
 	Memory/Paging/PageFrameAllocator.o \
+	Memory/Paging/PageMapIndexer.o \
+	Memory/Paging/PageTableManager.o \
 	Bitmap.o \
 	String.o
 
