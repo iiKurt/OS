@@ -29,3 +29,5 @@ public:
 	uint64_t GetUsedRAM();
 	uint64_t GetReservedRAM();
 };
+
+extern PageFrameAllocator GlobalAllocator;

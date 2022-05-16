@@ -6,6 +6,7 @@ uint64_t freeMemory; // Unused memory
 uint64_t reservedMemory; // Reserved/unusable memory for e.g. ACPI tables
 uint64_t usedMemory; // Allocated memory from the page frame allocator
 bool Initialised = false;
+PageFrameAllocator GlobalAllocator;
 
 void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapSize, size_t mMapDescriptorSize) {
 	if (Initialised) { // Don't initialise twice
