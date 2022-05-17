@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 
+uint64_t totalMemory; // Total system memory detected on boot
 uint64_t freeMemory; // Unused memory
 uint64_t reservedMemory; // Reserved/unusable memory for e.g. ACPI tables
 uint64_t usedMemory; // Allocated memory from the page frame allocator
@@ -30,6 +31,7 @@ void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mM
 	}
 
 	uint64_t memorySize = GetMemorySize(mMap, mMapEntries, mMapDescriptorSize);
+	totalMemory = memorySize;
 	freeMemory = memorySize;
 
 	uint64_t bitmapSize = memorySize / 4096 / 8 + 1;
@@ -61,15 +63,15 @@ void PageFrameAllocator::InitBitmap(size_t bitmapSize, void* bufferAddress) {
 	}
 }
 
-
+uint64_t pageBitmapIndex = 0;
 void* PageFrameAllocator::RequestPage() {
-	for (uint64_t i = 0; i < PageBitmap.Size * 8; i++) {
-		if (PageBitmap[i] == true) {
+	for (; pageBitmapIndex < PageBitmap.Size * 8; pageBitmapIndex++) {
+		if (PageBitmap[pageBitmapIndex] == true) {
 			continue;
 		}
 
-		LockPage((void*)(i * 4096));
-		return (void*)(i * 4096);
+		LockPage((void*)(pageBitmapIndex * 4096));
+		return (void*)(pageBitmapIndex * 4096);
 	}
 
 	return NULL; // Oopies! Ideally we want to perform a disk page file swap here
@@ -81,10 +83,13 @@ void PageFrameAllocator::FreePage(void* address) {
 	if (PageBitmap[index] == false) { // Already free
 		return;
 	}
-	PageBitmap.Set(index, false); // Make it free
-
-	freeMemory += 4096;
-	usedMemory -= 4096;
+	if (PageBitmap.Set(index, false)) { // Make it free
+		freeMemory += 4096;
+		usedMemory -= 4096;
+		if (pageBitmapIndex > index) {
+			pageBitmapIndex = index;
+		}
+	}
 }
 
 void PageFrameAllocator::FreePages(void* address, uint64_t pageCount) {
@@ -98,10 +103,10 @@ void PageFrameAllocator::LockPage(void* address) {
 	if (PageBitmap[index] == true) { // Already locked
 		return;
 	}
-	PageBitmap.Set(index, true); // Make it locked
-
-	freeMemory -= 4096;
-	usedMemory += 4096;
+	if (PageBitmap.Set(index, true)) { // Make it locked
+		freeMemory -= 4096;
+		usedMemory += 4096;
+	}
 }
 
 void PageFrameAllocator::LockPages(void* address, uint64_t pageCount) {
@@ -115,10 +120,13 @@ void PageFrameAllocator::UnreservePage(void* address) {
 	if (PageBitmap[index] == false) { // Already unreserved
 		return;
 	}
-	PageBitmap.Set(index, false); // Make it unreserved
-
-	freeMemory += 4096;
-	reservedMemory -= 4096;
+	if (PageBitmap.Set(index, false)) { // Make it unreserved
+		freeMemory += 4096;
+		reservedMemory -= 4096;
+		if (pageBitmapIndex > index) {
+			pageBitmapIndex = index;
+		}
+	}
 }
 
 void PageFrameAllocator::UnreservePages(void* address, uint64_t pageCount) {
@@ -132,10 +140,10 @@ void PageFrameAllocator::ReservePage(void* address) {
 	if (PageBitmap[index] == true) { // Already reserved
 		return;
 	}
-	PageBitmap.Set(index, true); // Make it rerserved
-
-	freeMemory -= 4096;
-	reservedMemory += 4096;
+	if (PageBitmap.Set(index, true)) { // Make it reserved
+		freeMemory -= 4096;
+		reservedMemory += 4096;
+	}
 }
 
 void PageFrameAllocator::ReservePages(void* address, uint64_t pageCount) {
@@ -144,6 +152,10 @@ void PageFrameAllocator::ReservePages(void* address, uint64_t pageCount) {
 	}
 }
 
+
+uint64_t PageFrameAllocator::GetTotalRAM() {
+	return totalMemory;
+}
 
 uint64_t PageFrameAllocator::GetFreeRAM() {
 	return freeMemory;

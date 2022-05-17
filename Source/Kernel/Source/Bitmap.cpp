@@ -3,6 +3,8 @@
 // WTF
 
 bool Bitmap::operator[](uint64_t index) const {
+	if (index >= Size * 8) return false;
+
 	uint64_t byteIndex = index / 8;
 	uint8_t bitIndex = index % 8;
 	uint8_t bitIndexer = 0b10000000 >> bitIndex;
@@ -10,7 +12,9 @@ bool Bitmap::operator[](uint64_t index) const {
 	return ((Buffer[byteIndex] & bitIndexer) > 0);
 }
 
-void Bitmap::Set(uint64_t index, bool value) {
+bool Bitmap::Set(uint64_t index, bool value) {
+	if (index >= Size * 8) return false;
+
 	uint64_t byteIndex = index / 8;
 	uint8_t bitIndex = index % 8;
 	uint8_t bitIndexer = 0b10000000 >> bitIndex;
@@ -20,4 +24,5 @@ void Bitmap::Set(uint64_t index, bool value) {
 	if (value) {
 		Buffer[byteIndex] |= bitIndexer;
 	}
+	return true;
 }

@@ -15,6 +15,7 @@ KERNEL			:= $(BUILDDIR)/Kernel.elf
 
 OBJECTS			:= \
 	Kernel.o \
+	KernelUtilities.o \
 	Graphics/Painter.o \
 	Graphics/Console.o \
 	Memory/EFIMemory.o \
@@ -22,6 +23,7 @@ OBJECTS			:= \
 	Memory/Paging/PageFrameAllocator.o \
 	Memory/Paging/PageMapIndexer.o \
 	Memory/Paging/PageTableManager.o \
+	Memory/Paging/Paging.o \
 	Bitmap.o \
 	String.o
 
