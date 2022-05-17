@@ -11,5 +11,5 @@ public:
 	bool operator[](uint64_t index) const;
 	// https://stackoverflow.com/a/46820522
 	// https://stackoverflow.com/a/11066591
-	void Set(uint64_t index, bool value);
+	bool Set(uint64_t index, bool value);
 };
