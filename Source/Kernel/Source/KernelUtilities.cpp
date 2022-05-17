@@ -1,6 +1,9 @@
 #include "KernelUtilities.hpp"
 
 #include "GDT/GDT.hpp"
+#include "Interrupts/IDT.hpp"
+#include "Interrupts/Interrupts.hpp"
+#include "Graphics/Painter.hpp"
 
 KernelInfo kernelInfo;
 PageTableManager pageTableManager = NULL;
@@ -35,7 +38,24 @@ void PrepareMemory(BootInfo* bootInfo) {
 	kernelInfo.pageTableManager = &pageTableManager;
 }
 
+IDTR idtr;
+void PrepareInterrupts() {
+	idtr.Limit = 0x0fff;
+	idtr.Offset = (uint64_t)GlobalAllocator.RequestPage();
+
+	IDTDescEntry* int_PageFault = (IDTDescEntry*)(idtr.Offset + 0xe * sizeof(IDTDescEntry));
+	int_PageFault->SetOffset((uint64_t)PageFault_Handler);
+	int_PageFault->type_attr = IDT_TA_InterruptGate;
+	int_PageFault->selector = 0x08;
+
+	asm ("lidt %0" : : "m" (idtr));
+}
+
+Painter p = Painter(NULL, NULL);
 KernelInfo InitialiseKernel(BootInfo* bootInfo) {
+	p = Painter(bootInfo->fb, bootInfo->font);
+	GlobalPainter = &p;
+
 	GDTDescriptor gdtDescriptor;
 	gdtDescriptor.Size = sizeof(GDT) - 1;
 	gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
@@ -44,5 +64,7 @@ KernelInfo InitialiseKernel(BootInfo* bootInfo) {
 	PrepareMemory(bootInfo);
 	memset(bootInfo->fb->BaseAddress, 0, bootInfo->fb->BufferSize);
 	
+	PrepareInterrupts();
+
 	return kernelInfo;
 }

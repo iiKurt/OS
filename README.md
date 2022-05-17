@@ -6,8 +6,9 @@ Operating System
 
 | Utility                         | Category      | Notes                                                                  |
 |---------------------------------|---------------|------------------------------------------------------------------------|
-| wget                            | Initial Setup | Used to download OVMF & Binutils/GCC sources                            |
+| wget                            | Initial Setup | Used to download OVMF & Binutils/GCC sources                           |
 | Make                            | Build         |                                                                        |
+| nasm                            | Compilation   | For compiling small bits of assembly in the kernel                     |
 | Clang, LLD                      | Compilation   | Component of LLVM, used to compile EFI Bootloader and cross compiler.  |
 | QEMU                            | Execution     | Can use another emulator or run on real hardware.                      |
 | dd                              | Distrubution  |                                                                        |

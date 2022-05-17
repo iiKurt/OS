@@ -23,6 +23,8 @@ OBJECTS			:= \
 	Graphics/Console.o \
 	GDT/LoadGDT.o \
 	GDT/GDT.o \
+	Interrupts/IDT.o \
+	Interrupts/Interrupts.o \
 	Memory/EFIMemory.o \
 	Memory/Memory.o \
 	Memory/Paging/PageFrameAllocator.o \
@@ -41,6 +43,10 @@ DEPENDENCIES	:= $(patsubst %.o,%.d,$(OBJECTS))
 # link the object files into the ELF file under Build/kernel.elf, if objects are newer than the ELF file
 $(KERNEL): $(OBJECTS)
 	@$(CXX) $(LDFLAGS) -o $@ $(OBJECTS)
+
+$(BUILDDIR)/Interrupts/Interrupts.o: $(SOURCEDIR)/Interrupts/Interrupts.cpp
+	@mkdir -p $(dir $@)
+	@$(CXX) -I$(SHARED) -mno-red-zone -mgeneral-regs-only -ffreestanding -c $< -o $@
 
 # rules for module files
 $(BUILDDIR)/%.o: $(SOURCEDIR)/%.cpp

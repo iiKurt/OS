@@ -1,5 +1,7 @@
 #include "Painter.hpp"
 
+Painter* GlobalPainter;
+
 Painter::Painter(Framebuffer* fb, PSF1_FONT* font) {
 	this->FB = fb;
 	this->Font = font;

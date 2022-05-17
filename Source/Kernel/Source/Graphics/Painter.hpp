@@ -23,3 +23,5 @@ public:
 	void DrawGradientRectangle(unsigned int xOff, unsigned int yOff, unsigned int w, unsigned int h,
                                uint32_t sourceColor, uint32_t destinationColor, Orientation orientation = Orientation::Vertical);
 };
+
+extern Painter* GlobalPainter;

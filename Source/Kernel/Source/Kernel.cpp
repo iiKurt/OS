@@ -1,7 +1,6 @@
 #include <BootInfo.h>
 
 #include "KernelUtilities.hpp"
-#include "Graphics/Painter.hpp"
 #include "Graphics/Console.hpp"
 #include "String.hpp"
 
@@ -9,8 +8,11 @@ extern "C" void _start(BootInfo* bootInfo) {
 	KernelInfo kernelInfo = InitialiseKernel(bootInfo);
 	PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
-	Painter p = Painter(bootInfo->fb, bootInfo->font);
-	Console c = Console(&p);
+	//asm ("int $0x0e");
+	int* test = (int*)0x800000000;
+	*test = 2;
+
+	Console c = Console(GlobalPainter);
 
 	c.Clear(0xFF000000, 0xFF0000FF);
 	// Print some information about the system

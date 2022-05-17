@@ -25,5 +25,5 @@ Bootloader:
 		Deleting all the CFLAGS in makefile.variables and replacing it with poncho's
 
 Kernel:
-	Framebuffer glitch briefly appears while booting. Only occurs with large memory sizes.
+	Framebuffer glitch briefly appears while booting. Only occurs with large memory sizes & on QEMU..?
 	Print a buildstamp on boot (build stamp of whole OS or just kernel?)
