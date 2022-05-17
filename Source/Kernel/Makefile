@@ -1,6 +1,9 @@
 # defines the compiler and linker paths and arguments
 include ../../Makefile.variables
 
+ASMC			:= nasm
+ASMFLAGS		:= 
+
 # object file generation path
 BUILDDIR		:= Build
 # modules path
@@ -18,6 +21,8 @@ OBJECTS			:= \
 	KernelUtilities.o \
 	Graphics/Painter.o \
 	Graphics/Console.o \
+	GDT/LoadGDT.o \
+	GDT/GDT.o \
 	Memory/EFIMemory.o \
 	Memory/Memory.o \
 	Memory/Paging/PageFrameAllocator.o \
@@ -42,8 +47,13 @@ $(BUILDDIR)/%.o: $(SOURCEDIR)/%.cpp
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%.asm
+	@mkdir -p $(dir $@)
+	@$(ASMC) $(ASMFLAGS) $^ -f elf64 -o $@
+
 # include the dependencies if they exist
 -include $(DEPENDENCIES)
 
+.PHONY: clean
 clean:
 	-@rm -rf $(BUILDDIR)

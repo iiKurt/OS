@@ -1,5 +1,7 @@
 #include "KernelUtilities.hpp"
 
+#include "GDT/GDT.hpp"
+
 KernelInfo kernelInfo;
 PageTableManager pageTableManager = NULL;
 void PrepareMemory(BootInfo* bootInfo) {
@@ -34,6 +36,11 @@ void PrepareMemory(BootInfo* bootInfo) {
 }
 
 KernelInfo InitialiseKernel(BootInfo* bootInfo) {
+	GDTDescriptor gdtDescriptor;
+	gdtDescriptor.Size = sizeof(GDT) - 1;
+	gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
+	LoadGDT(&gdtDescriptor);
+
 	PrepareMemory(bootInfo);
 	memset(bootInfo->fb->BaseAddress, 0, bootInfo->fb->BufferSize);
 	
