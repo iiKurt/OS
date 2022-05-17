@@ -18,6 +18,7 @@ public:
 	Console(Painter* painter);
 
 	void Print(const char* str);
+	void PrintLine();
 	void PrintLine(const char* str);
 	void Reset();
 	void Clear();

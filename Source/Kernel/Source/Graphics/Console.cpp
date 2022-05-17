@@ -22,6 +22,11 @@ void Console::Print(const char* str) {
 	}
 }
 
+void Console::PrintLine() {
+	cursorPosition.X = 0;
+	cursorPosition.Y += 16;
+}
+
 void Console::PrintLine(const char* str) {
 	Print(str);
 	cursorPosition.X = 0;

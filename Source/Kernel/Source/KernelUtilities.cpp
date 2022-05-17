@@ -4,6 +4,7 @@
 #include "Interrupts/IDT.hpp"
 #include "Interrupts/Interrupts.hpp"
 #include "Graphics/Painter.hpp"
+#include "IO.hpp"
 
 KernelInfo kernelInfo;
 PageTableManager pageTableManager = NULL;
@@ -43,12 +44,38 @@ void PrepareInterrupts() {
 	idtr.Limit = 0x0fff;
 	idtr.Offset = (uint64_t)GlobalAllocator.RequestPage();
 
+	// Page fault
 	IDTDescEntry* int_PageFault = (IDTDescEntry*)(idtr.Offset + 0xe * sizeof(IDTDescEntry));
 	int_PageFault->SetOffset((uint64_t)PageFault_Handler);
 	int_PageFault->type_attr = IDT_TA_InterruptGate;
 	int_PageFault->selector = 0x08;
 
+	// Double fault
+	IDTDescEntry* int_DoubleFault = (IDTDescEntry*)(idtr.Offset + 0x8 * sizeof(IDTDescEntry));
+	int_DoubleFault->SetOffset((uint64_t)DoubleFault_Handler);
+	int_DoubleFault->type_attr = IDT_TA_InterruptGate;
+	int_DoubleFault->selector = 0x08;
+
+	// General protection fault
+	IDTDescEntry* int_GPFault = (IDTDescEntry*)(idtr.Offset + 0xd * sizeof(IDTDescEntry));
+	int_GPFault->SetOffset((uint64_t)GPFault_Handler);
+	int_GPFault->type_attr = IDT_TA_InterruptGate;
+	int_GPFault->selector = 0x08;
+
+	// Keyboard interrupt
+	IDTDescEntry* int_Keyboard = (IDTDescEntry*)(idtr.Offset + 0x21 * sizeof(IDTDescEntry));
+	int_Keyboard->SetOffset((uint64_t)KeyboardInt_Handler);
+	int_Keyboard->type_attr = IDT_TA_InterruptGate;
+	int_Keyboard->selector = 0x08;
+
 	asm ("lidt %0" : : "m" (idtr));
+
+	RemapPIC();
+
+	outb(PIC1_DATA, 0b11111101);
+	outb(PIC2_DATA, 0b11111111);
+
+	asm ("sti");
 }
 
 Painter p = Painter(NULL, NULL);

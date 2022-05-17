@@ -19,6 +19,8 @@ KERNEL			:= $(BUILDDIR)/Kernel.elf
 OBJECTS			:= \
 	Kernel.o \
 	KernelUtilities.o \
+	Panic.o \
+	IO.o \
 	Graphics/Painter.o \
 	Graphics/Console.o \
 	GDT/LoadGDT.o \

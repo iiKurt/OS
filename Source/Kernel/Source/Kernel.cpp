@@ -8,10 +8,6 @@ extern "C" void _start(BootInfo* bootInfo) {
 	KernelInfo kernelInfo = InitialiseKernel(bootInfo);
 	PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
-	//asm ("int $0x0e");
-	int* test = (int*)0x800000000;
-	*test = 2;
-
 	Console c = Console(GlobalPainter);
 
 	c.Clear(0xFF000000, 0xFF0000FF);
@@ -48,6 +44,7 @@ extern "C" void _start(BootInfo* bootInfo) {
 		c.PrintLine(to_string((int64_t)address, 16, 16));
 	}
 
-	for (;;) { __asm__("cli; hlt"); } // Halt the system
+	while (true);
+	//for (;;) { __asm__("cli; hlt"); } // Halt the system
 	return;
 }
