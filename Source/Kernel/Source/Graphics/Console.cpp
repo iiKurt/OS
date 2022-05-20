@@ -15,6 +15,9 @@ void Console::Print(const char* str) {
 			cursorPosition.X = 0;
 			cursorPosition.Y += 16;
 		}
+		if (cursorPosition.Y + 16 > painter->FB->Height) {
+			cursorPosition.Y = 0;
+		}
 		painter->PrintCharacter(*chr, cursorPosition.X, cursorPosition.Y, ForegroundColor, BackgroundColor);
 
 		cursorPosition.X += 8; // Move 8 pixels to the right

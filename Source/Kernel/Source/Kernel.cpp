@@ -1,14 +1,17 @@
+#include "Kernel.hpp"
+
 #include <BootInfo.h>
 
 #include "KernelUtilities.hpp"
-#include "Graphics/Console.hpp"
 #include "String.hpp"
 
+Console* KernelConsole;
 extern "C" void _start(BootInfo* bootInfo) {
 	KernelInfo kernelInfo = InitialiseKernel(bootInfo);
 	PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
 	Console c = Console(GlobalPainter);
+	KernelConsole = &c;
 
 	c.Clear(0xFF000000, 0xFF0000FF);
 	// Print some information about the system

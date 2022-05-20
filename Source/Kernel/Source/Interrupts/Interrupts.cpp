@@ -4,6 +4,8 @@
 
 #include "../Graphics/Painter.hpp"
 
+#include "../Kernel.hpp"
+
 void Halt() {
 	for (;;) { __asm__("cli; hlt"); } // Halt the system, prevents a system reset
 }
@@ -25,7 +27,8 @@ __attribute__((interrupt)) void GPFault_Handler(struct interrupt_frame* frame) {
 
 int testr = 0;
 __attribute__((interrupt)) void KeyboardInt_Handler(struct interrupt_frame* frame) {
-	GlobalPainter->PrintString("Key Pressed", 512, testr);
+	//GlobalPainter->PrintString("Key Pressed", 512, testr);
+	KernelConsole->PrintLine("Howdydo");
 	testr += 16;
 	uint8_t scancode = inb(0x60); // Port of PS/2 keyboard
 	PIC_EndMaster();
